@@ -1,0 +1,24 @@
+# Render Blueprint — MIITHII engine (free web service tier)
+# Docs: https://render.com/docs/blueprint-spec
+# After merge: Render Dashboard → New → Blueprint → select dhrubasumatary/miithii-corp
+# Secrets are set in the dashboard (sync: false) — never committed here.
+services:
+  - type: web
+    name: miithii-engine
+    runtime: docker
+    dockerfilePath: ./miithii-engine/Dockerfile
+    dockerContext: ./miithii-engine
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_URL_ADMIN
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: AIMLAPI_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: "*"
