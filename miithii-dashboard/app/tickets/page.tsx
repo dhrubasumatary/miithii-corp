@@ -36,6 +36,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { latency, relativeTime } from "@/lib/format";
+import { AppShell } from "@/components/app-shell";
+import { KeyGate } from "@/components/key-gate";
 import { engine } from "@/lib/engine";
 import type { AnalysisResult, TicketRow } from "@/lib/engine";
 
@@ -102,6 +104,8 @@ export default function TicketsPage() {
   }
 
   return (
+    <KeyGate>
+    <AppShell>
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
@@ -278,6 +282,8 @@ export default function TicketsPage() {
       </Card>
       </FadeUp>
     </div>
+    </AppShell>
+    </KeyGate>
   );
 }
 

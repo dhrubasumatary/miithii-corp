@@ -107,6 +107,8 @@ class Tenant(Base, TimestampMixin):
     policy_config: Mapped[dict] = mapped_column(
         JSONB, default=dict, server_default=text("'{}'::jsonb"), nullable=False
     )
+    owner_email: Mapped[str | None] = mapped_column(String(320))
+    signup_ip: Mapped[str | None] = mapped_column(String(64))
 
 
 class User(Base, TimestampMixin):

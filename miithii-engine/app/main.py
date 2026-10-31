@@ -79,6 +79,10 @@ def create_app() -> FastAPI:
             engine = create_db_engine(settings.database_url)
             app.state.engine = engine
             app.state.session_factory = create_session_factory(engine)
+            if settings.database_url_admin:
+                app.state.admin_session_factory = create_session_factory(
+                    create_db_engine(settings.database_url_admin)
+                )
             logger.info("db_engine_started")
         else:
             logger.warning("db_not_configured")
@@ -105,9 +109,11 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(tickets_router)
     from app.routes.knowledge import router as knowledge_router
+    from app.routes.signup import router as signup_router
     from app.routes.usage import router as usage_router
 
     app.include_router(knowledge_router)
+    app.include_router(signup_router)
     app.include_router(usage_router)
     return app
 

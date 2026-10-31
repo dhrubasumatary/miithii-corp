@@ -21,6 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AppShell } from "@/components/app-shell";
+import { KeyGate } from "@/components/key-gate";
 import { engine } from "@/lib/engine";
 import type { UsageSummary } from "@/lib/engine";
 
@@ -45,6 +47,8 @@ export default function UsagePage() {
   const totals = usage?.totals;
 
   return (
+    <KeyGate>
+    <AppShell>
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
@@ -145,5 +149,7 @@ export default function UsagePage() {
         </CardContent>
       </Card>
     </div>
+    </AppShell>
+    </KeyGate>
   );
 }

@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { AppShell } from "@/components/app-shell";
+import { KeyGate } from "@/components/key-gate";
 import { engine } from "@/lib/engine";
 import type { KnowledgeRow } from "@/lib/engine";
 
@@ -54,6 +56,8 @@ export default function KnowledgePage() {
   }, [refresh]);
 
   return (
+    <KeyGate>
+    <AppShell>
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
@@ -147,6 +151,8 @@ export default function KnowledgePage() {
         </CardContent>
       </Card>
     </div>
+    </AppShell>
+    </KeyGate>
   );
 }
 

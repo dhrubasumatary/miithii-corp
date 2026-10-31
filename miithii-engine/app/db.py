@@ -34,6 +34,13 @@ def create_session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSessi
     return async_sessionmaker(engine, expire_on_commit=False)
 
 
+async def get_admin_session(request: Request) -> AsyncIterator[AsyncSession]:
+    """Provisioning path (signup): admin role, no tenant binding."""
+    factory: async_sessionmaker[AsyncSession] = request.app.state.admin_session_factory
+    async with factory() as session:
+        yield session
+
+
 async def get_session(request: Request) -> AsyncIterator[AsyncSession]:
     """FastAPI dependency: one session per request, from lifespan-managed engine."""
     factory: async_sessionmaker[AsyncSession] = request.app.state.session_factory

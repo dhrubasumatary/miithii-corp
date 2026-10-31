@@ -109,6 +109,19 @@ export const engine = {
     return res.ok;
   },
   usage: () => req<UsageSummary>("/v1/usage"),
+  async signup(company: string, email: string): Promise<{ tenant_id: string; api_key: string }> {
+    const res = await fetch(`${ENGINE_URL}/v1/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ company, email }),
+    });
+    const data = (await res.json().catch(() => ({}))) as {
+      api_key?: string;
+      detail?: string;
+    };
+    if (!res.ok || !data.api_key) throw new Error(data.detail ?? "Signup failed");
+    return { tenant_id: "", api_key: data.api_key };
+  },
   listTickets: () => req<TicketRow[]>("/v1/tickets"),
   /**
    * Streams the real pipeline stages over SSE (classify -> retrieve ->
