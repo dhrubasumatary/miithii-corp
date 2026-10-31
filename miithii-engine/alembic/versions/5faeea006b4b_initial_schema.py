@@ -8,11 +8,11 @@ Create Date: 2026-10-31 17:00:36.335007
 
 from collections.abc import Sequence
 
+import pgvector.sqlalchemy  # noqa: F401 - referenced in VECTOR column below
 import sqlalchemy as sa
-from alembic import op
 from sqlalchemy.dialects import postgresql
 
-import pgvector.sqlalchemy  # noqa: F401 - referenced in VECTOR column below
+from alembic import op
 
 revision: str = '5faeea006b4b'
 down_revision: str | None = None

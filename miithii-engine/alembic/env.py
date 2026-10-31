@@ -6,10 +6,8 @@ percent-encoded passwords in pooler URLs break ConfigParser interpolation.
 
 import asyncio
 import os
-from collections.abc import Sequence
 
 from alembic import context
-
 from app.config import get_settings
 from app.db import create_db_engine
 from app.models import Base
