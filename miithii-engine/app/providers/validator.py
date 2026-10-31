@@ -13,19 +13,34 @@ class DraftValidationError(ValueError):
 
 
 WORKFLOW_CLAIMS: tuple[str, ...] = (
-    "i have escalated", "i've escalated", "we have escalated", "we've escalated",
-    "your request has been escalated", "your ticket has been escalated",
-    "this ticket has been escalated", "has been escalated to",
-    "has been sent to the security team", "has been sent to the support team",
-    "the security team has been notified", "the support team has been notified",
-    "will contact you", "has been refunded", "has been revoked",
-    "has been rotated", "ownership has been changed",
+    "i have escalated",
+    "i've escalated",
+    "we have escalated",
+    "we've escalated",
+    "your request has been escalated",
+    "your ticket has been escalated",
+    "this ticket has been escalated",
+    "has been escalated to",
+    "has been sent to the security team",
+    "has been sent to the support team",
+    "the security team has been notified",
+    "the support team has been notified",
+    "will contact you",
+    "has been refunded",
+    "has been revoked",
+    "has been rotated",
+    "ownership has been changed",
 )
 
 # A hard REFUSE must not imply review/escalation exists as an option.
 REFUSAL_ESCALATION_LANGUAGE: tuple[str, ...] = (
-    "requires review", "requires human review", "human review",
-    "security team", "support team", "escalate", "escalated",
+    "requires review",
+    "requires human review",
+    "human review",
+    "security team",
+    "support team",
+    "escalate",
+    "escalated",
 )
 
 

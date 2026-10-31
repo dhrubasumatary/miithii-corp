@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     aimlapi_timeout_s: float = 60.0
     classifier_confidence_threshold: float = 0.6
     draft_timeout_s: float = 45.0
+    embedding_model: str = "gemini-embedding-001"  # text-embedding-004 was retired from the API
     force_deterministic: bool = False  # tests/evals: no network, no cost
     host: str = "0.0.0.0"
     port: int = 8000

@@ -7,6 +7,7 @@ invisible (empty result), not a leak.
 
 import uuid
 
+import structlog
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,12 +27,26 @@ async def create_ticket(
     tenant: Tenant = Depends(require_tenant),
     session: AsyncSession = Depends(get_session),
 ) -> AnalysisResponse:
+    documents: dict[str, str] = {}
+    retriever = getattr(request.app.state, "retriever", None)
+    if retriever is not None:
+        try:
+            docs = await retriever.retrieve(
+                session,
+                query=f"{payload.subject}\n{payload.body}",
+                k=3,
+            )
+            documents = {d["citation"]: d["content"] for d in docs}
+        except Exception as exc:  # noqa: BLE001 - missing knowledge must not block analysis
+            structlog.get_logger(__name__).warning("retrieval_failed", error=str(exc)[:200])
+
     return await request.app.state.analyzer.analyze(
         session,
         tenant,
         subject=payload.subject,
         body=payload.body,
         request_id=request.headers.get("x-request-id"),
+        documents=documents,
     )
 
 
@@ -41,10 +56,10 @@ async def list_tickets(
     session: AsyncSession = Depends(get_session),
 ) -> list[dict]:
     rows = (
-        await session.execute(
-            select(Ticket).order_by(Ticket.created_at.desc()).limit(50)
-        )
-    ).scalars().all()
+        (await session.execute(select(Ticket).order_by(Ticket.created_at.desc()).limit(50)))
+        .scalars()
+        .all()
+    )
     return [
         {
             "id": str(t.id),
@@ -63,12 +78,16 @@ async def ticket_analyses(
     session: AsyncSession = Depends(get_session),
 ) -> list[dict]:
     rows = (
-        await session.execute(
-            select(Analysis)
-            .where(Analysis.ticket_id == ticket_id)
-            .order_by(Analysis.created_at.asc())
+        (
+            await session.execute(
+                select(Analysis)
+                .where(Analysis.ticket_id == ticket_id)
+                .order_by(Analysis.created_at.asc())
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return [
         {
             "id": str(a.id),

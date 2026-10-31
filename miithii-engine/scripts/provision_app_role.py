@@ -56,6 +56,7 @@ def main() -> int:
 
     password = secrets.token_urlsafe(18)
     grants = [
+        f"ALTER ROLE {ROLE} SET search_path = public, extensions",
         f"GRANT USAGE ON SCHEMA public, extensions TO {ROLE}",
         f"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO {ROLE}",
         "ALTER DEFAULT PRIVILEGES IN SCHEMA public "

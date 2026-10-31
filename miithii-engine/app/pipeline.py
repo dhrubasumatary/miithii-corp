@@ -75,8 +75,11 @@ class TicketAnalyzer:
 
         # 3) draft (LLM) with deterministic fallback, then validate
         context = DraftContext(
-            subject=subject, body=body, action=decision.action,
-            flags=decision.flags, documents=documents or {},
+            subject=subject,
+            body=body,
+            action=decision.action,
+            flags=decision.flags,
+            documents=documents or {},
         )
         draft = None
         used_provider = provider_name
@@ -119,7 +122,7 @@ class TicketAnalyzer:
             action=decision.action.value,
             answer=draft.answer,
             policy_flags=decision.flags,
-            citations=[],
+            citations=sorted(documents or {}),
             confidence=draft.confidence,
             latency_ms=latency_ms,
             prompt_tokens=draft.prompt_tokens,
@@ -159,7 +162,7 @@ class TicketAnalyzer:
             answer=draft.answer,
             requires_human=decision.requires_human,
             policy_flags=decision.flags,
-            citations=[],
+            citations=sorted(documents or {}),
             confidence=draft.confidence,
             latency_ms=latency_ms,
         )

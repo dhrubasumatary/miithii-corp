@@ -25,9 +25,7 @@ async def main() -> None:
         ).scalar_one_or_none()
         if tenant_id is None:
             result = await conn.execute(
-                insert(Tenant)
-                .values(name="CloudDesk (demo)", slug=SLUG)
-                .returning(Tenant.id)
+                insert(Tenant).values(name="CloudDesk (demo)", slug=SLUG).returning(Tenant.id)
             )
             tenant_id = result.scalar_one()
             print(f"tenant created: {SLUG} ({tenant_id})")

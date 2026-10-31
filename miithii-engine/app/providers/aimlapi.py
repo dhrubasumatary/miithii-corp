@@ -105,9 +105,10 @@ class AIMLAPIProvider(Provider):
         return ClassifierResult.model_validate(data)
 
     async def draft(self, context: DraftContext) -> DraftResult:
-        documents = "\n\n".join(
-            f"--- {name} ---\n{content}" for name, content in context.documents.items()
-        ) or "(no knowledge documents retrieved)"
+        documents = (
+            "\n\n".join(f"--- {name} ---\n{content}" for name, content in context.documents.items())
+            or "(no knowledge documents retrieved)"
+        )
         prompt = DRAFT_PROMPT.format(
             action=context.action.value,
             flags=", ".join(context.flags) or "none",

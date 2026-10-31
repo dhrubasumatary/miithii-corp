@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.db import create_db_engine, create_session_factory
+from app.embeddings import GeminiEmbedder, NullEmbedder
 from app.logging_config import configure_logging
 from app.middleware import RequestContextMiddleware
 from app.pipeline import TicketAnalyzer
@@ -21,6 +22,7 @@ from app.providers.base import Provider
 from app.providers.deterministic import DeterministicProvider
 from app.providers.failover import FailoverProvider
 from app.providers.gemini import GeminiProvider
+from app.retrieval import Retriever
 from app.routes.health import router as health_router
 from app.routes.tickets import router as tickets_router
 
@@ -66,6 +68,13 @@ def create_app() -> FastAPI:
             provider=_build_provider(settings),
             confidence_threshold=settings.classifier_confidence_threshold,
         )
+        if settings.gemini_api_key:
+            app.state.embedder = GeminiEmbedder(
+                settings.gemini_api_key, model=settings.embedding_model
+            )
+        else:
+            app.state.embedder = NullEmbedder()
+        app.state.retriever = Retriever(app.state.embedder)
         if settings.database_url:
             engine = create_db_engine(settings.database_url)
             app.state.engine = engine
@@ -95,6 +104,9 @@ def create_app() -> FastAPI:
     )
     app.include_router(health_router)
     app.include_router(tickets_router)
+    from app.routes.knowledge import router as knowledge_router
+
+    app.include_router(knowledge_router)
     return app
 
 
