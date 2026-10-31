@@ -54,13 +54,14 @@ jobs:
 
       - name: Enable pgvector
         run: |
-          uv run python -c "
+          uv run python - << 'PY'
           import psycopg
           c = psycopg.connect('postgresql://postgres:postgres@localhost:5432/miithii', autocommit=True)
           c.execute('CREATE SCHEMA IF NOT EXISTS extensions')
           c.execute('CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA extensions')
           c.execute("ALTER ROLE postgres SET search_path = public, extensions")
-          print('pgvector ready')"
+          print('pgvector ready')
+          PY
 
       - name: Migrate (alembic upgrade head)
         run: uv run alembic upgrade head
