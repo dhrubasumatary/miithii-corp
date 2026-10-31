@@ -1,0 +1,30 @@
+# Local orchestration — OPTIONAL (Supabase remains the default dev DB).
+# `docker compose --profile local up` runs a local pgvector + the engine.
+# Requires Docker Desktop; not needed for day-to-day dev (uv + Supabase).
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    profiles: ["local"]
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: miithii
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d miithii"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  engine:
+    build: ./miithii-engine
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/miithii}
+      DATABASE_URL_ADMIN: ${DATABASE_URL_ADMIN:-postgresql://postgres:postgres@postgres:5432/miithii}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      AIMLAPI_API_KEY: ${AIMLAPI_API_KEY:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
