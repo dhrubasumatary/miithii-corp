@@ -1,10 +1,12 @@
 "use client";
 
-import { ArrowUpRight, RefreshCw, Send } from "lucide-react";
+import { ArrowUpRight, Check, Copy, RefreshCw, Send } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { ActionBadge, FlagBadges } from "@/components/badges";
+import { AnalyzeProgress } from "@/components/analyze-progress";
+import { EmptyState, TableSkeleton } from "@/components/data-states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,22 +34,27 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { EngineError, engine } from "@/lib/engine";
+import { latency, relativeTime } from "@/lib/format";
+import { engine } from "@/lib/engine";
 import type { AnalysisResult, TicketRow } from "@/lib/engine";
 
 export default function TicketsPage() {
   const [tickets, setTickets] = useState<TicketRow[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
 
   const refresh = useCallback(async () => {
     try {
       setTickets(await engine.listTickets());
-    } catch (err) {
-      if (err instanceof EngineError && err.status === 401) resetKeyAndToast();
+    } catch {
+      // 401 is handled globally (auto gate); anything else stays quiet
+    } finally {
+      setLoaded(true);
     }
   }, []);
 
@@ -63,6 +70,7 @@ export default function TicketsPage() {
     setAnalyzing(true);
     setError("");
     setResult(null);
+    setCopied(false);
     try {
       const analysis = await engine.createTicket(subject.trim(), body.trim());
       setResult(analysis);
@@ -80,6 +88,13 @@ export default function TicketsPage() {
     }
   }
 
+  async function copyDraft() {
+    if (!result?.answer) return;
+    await navigator.clipboard.writeText(result.answer);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -87,7 +102,7 @@ export default function TicketsPage() {
           <h1 className="text-lg font-semibold">Tickets</h1>
           <p className="text-muted-foreground text-sm">
             Submit a customer ticket — MIITHII classifies it, applies policy,
-            and drafts a response.
+            retrieves your knowledge, and drafts the reply.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={() => void refresh()}>
@@ -100,7 +115,7 @@ export default function TicketsPage() {
         <CardHeader>
           <CardTitle>New ticket</CardTitle>
           <CardDescription>
-            Live analysis typically takes 10–45 seconds.
+            The draft is a suggestion — review it, then send it yourself.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -108,51 +123,65 @@ export default function TicketsPage() {
             placeholder="Subject — e.g. Production API is down"
             value={subject}
             onChange={(event) => setSubject(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && event.ctrlKey) void analyze();
+            }}
             maxLength={500}
             disabled={analyzing}
           />
-          <Textarea
-            placeholder="Paste the customer's message here…"
-            value={body}
-            onChange={(event) => setBody(event.target.value)}
-            rows={5}
-            maxLength={10000}
-            disabled={analyzing}
-          />
+          <div className="flex flex-col gap-1">
+            <Textarea
+              placeholder="Paste the customer's message here…  (Ctrl+Enter to analyze)"
+              value={body}
+              onChange={(event) => setBody(event.target.value)}
+              rows={5}
+              maxLength={10000}
+              disabled={analyzing}
+              className="resize-none"
+            />
+            <span className="text-muted-foreground self-end text-xs">
+              {body.length}/10,000
+            </span>
+          </div>
           {error ? <p className="text-destructive text-sm">{error}</p> : null}
           <Button
             onClick={() => void analyze()}
             disabled={analyzing || !subject.trim() || !body.trim()}
             className="self-start"
           >
-            {analyzing ? (
-              <>
-                <Send className="h-4 w-4 animate-pulse" />
-                Analyzing…
-              </>
-            ) : (
-              <>
-                <Send className="h-4 w-4" />
-                Analyze ticket
-              </>
-            )}
+            <Send className="h-4 w-4" />
+            {analyzing ? "Analyzing…" : "Analyze ticket"}
           </Button>
         </CardContent>
       </Card>
 
-      {result ? (
+      {analyzing ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Working on it</CardTitle>
+            <CardDescription>
+              Usually 10–45 seconds depending on provider load.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AnalyzeProgress active={analyzing} />
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {result && !analyzing ? (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Analysis</CardTitle>
+                <CardTitle>Draft response</CardTitle>
                 <CardDescription>
-                  {result.category.replaceAll("_", " ")} · {result.severity} ·{" "}
+                  {result.category.replaceAll("_", " ")} · {result.severity}
                   {result.confidence != null
-                    ? `${Math.round(result.confidence * 100)}% confidence`
+                    ? ` · ${Math.round(result.confidence * 100)}% confidence`
                     : null}
-                  {result.latency_ms != null
-                    ? ` · ${(result.latency_ms / 1000).toFixed(1)}s`
+                  {latency(result.latency_ms)
+                    ? ` · ${latency(result.latency_ms)}`
                     : null}
                 </CardDescription>
               </div>
@@ -164,18 +193,37 @@ export default function TicketsPage() {
             <div className="rounded-md border bg-muted/40 p-4 text-sm whitespace-pre-wrap">
               {result.answer ?? "No response generated."}
             </div>
-            {result.citations.length ? (
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-muted-foreground text-xs">sources:</span>
-                {result.citations.map((citation) => (
-                  <Badge key={citation} variant="outline">
-                    {citation}
-                  </Badge>
-                ))}
-              </div>
-            ) : null}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {result.citations.length ? (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-muted-foreground text-xs">
+                    sources:
+                  </span>
+                  {result.citations.map((citation) => (
+                    <Badge key={citation} variant="outline">
+                      {citation}
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <span />
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void copyDraft()}
+                disabled={!result.answer}
+              >
+                {copied ? (
+                  <Check className="h-4 w-4 text-emerald-400" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+                {copied ? "Copied" : "Copy draft"}
+              </Button>
+            </div>
             {result.requires_human ? (
-              <p className="text-red-400 text-sm">
+              <p className="text-sm text-red-400">
                 Human review required — do not send without an employee reading
                 this.
               </p>
@@ -192,32 +240,31 @@ export default function TicketsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Subject</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Created</TableHead>
-                <TableHead className="w-10" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tickets.length === 0 ? (
+          {!loaded ? (
+            <TableSkeleton />
+          ) : tickets.length === 0 ? (
+            <EmptyState
+              icon="tickets"
+              title="No tickets yet"
+              description="Analyze your first ticket above — every result lands in this queue with its full audit trail."
+            />
+          ) : (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="text-muted-foreground py-8 text-center"
-                  >
-                    No tickets yet.
-                  </TableCell>
+                  <TableHead>Subject</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Created</TableHead>
+                  <TableHead className="w-10" />
                 </TableRow>
-              ) : (
-                tickets.map((ticket) => (
+              </TableHeader>
+              <TableBody>
+                {tickets.map((ticket) => (
                   <TicketSheetRow key={ticket.id} ticket={ticket} />
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
@@ -242,19 +289,21 @@ function TicketSheetRow({ ticket }: { ticket: TicketRow }) {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<TableRow className="cursor-pointer" onClick={() => void load()} />}>
-          <TableCell className="max-w-md truncate font-medium">
-            {ticket.subject}
-          </TableCell>
-          <TableCell>
-            <Badge variant="outline">{ticket.status}</Badge>
-          </TableCell>
-          <TableCell className="text-right text-muted-foreground text-xs">
-            {new Date(ticket.created_at).toLocaleString()}
-          </TableCell>
-          <TableCell>
-            <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-          </TableCell>
+      <SheetTrigger
+        render={<TableRow className="cursor-pointer" onClick={() => void load()} />}
+      >
+        <TableCell className="max-w-md truncate font-medium">
+          {ticket.subject}
+        </TableCell>
+        <TableCell>
+          <Badge variant="outline">{ticket.status}</Badge>
+        </TableCell>
+        <TableCell className="text-muted-foreground text-right text-xs">
+          {relativeTime(ticket.created_at)}
+        </TableCell>
+        <TableCell>
+          <ArrowUpRight className="text-muted-foreground h-4 w-4" />
+        </TableCell>
       </SheetTrigger>
       <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
         <SheetHeader>
@@ -263,7 +312,10 @@ function TicketSheetRow({ ticket }: { ticket: TicketRow }) {
         </SheetHeader>
         <div className="flex flex-col gap-4 p-4">
           {analyses === null ? (
-            <p className="text-muted-foreground text-sm">Loading…</p>
+            <div className="flex flex-col gap-3">
+              <div className="bg-muted h-24 animate-pulse rounded-md" />
+              <div className="bg-muted h-24 animate-pulse rounded-md" />
+            </div>
           ) : analyses.length === 0 ? (
             <p className="text-muted-foreground text-sm">No analyses.</p>
           ) : (
@@ -273,14 +325,14 @@ function TicketSheetRow({ ticket }: { ticket: TicketRow }) {
                   <div className="flex items-center justify-between">
                     <ActionBadge action={analysis.action} />
                     <span className="text-muted-foreground text-xs">
-                      {new Date(analysis.created_at).toLocaleString()}
+                      {relativeTime(analysis.created_at)}
                     </span>
                   </div>
                   <CardDescription className="text-xs">
                     {analysis.category.replaceAll("_", " ")} ·{" "}
                     {analysis.provider}/{analysis.model}
-                    {analysis.latency_ms != null
-                      ? ` · ${(analysis.latency_ms / 1000).toFixed(1)}s`
+                    {latency(analysis.latency_ms)
+                      ? ` · ${latency(analysis.latency_ms)}`
                       : null}
                   </CardDescription>
                 </CardHeader>
@@ -297,8 +349,4 @@ function TicketSheetRow({ ticket }: { ticket: TicketRow }) {
       </SheetContent>
     </Sheet>
   );
-}
-
-function resetKeyAndToast() {
-  toast.error("API key rejected — connect again.");
 }

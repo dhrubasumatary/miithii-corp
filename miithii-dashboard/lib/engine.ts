@@ -60,6 +60,12 @@ export function getApiKey(): string {
   return localStorage.getItem(KEY_STORAGE) ?? "";
 }
 
+function handleAuthFailure() {
+  // the key stopped working — drop it and let the gate take over
+  localStorage.removeItem(KEY_STORAGE);
+  window.location.reload();
+}
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${ENGINE_URL}${path}`, {
     ...init,
@@ -71,6 +77,7 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
     cache: "no-store",
   });
   if (res.status === 401) {
+    handleAuthFailure();
     throw new EngineError(401, "Invalid or missing API key");
   }
   if (!res.ok) {

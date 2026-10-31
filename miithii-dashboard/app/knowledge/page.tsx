@@ -4,6 +4,7 @@ import { Globe, RefreshCw, Upload } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { EmptyState, TableSkeleton } from "@/components/data-states";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -35,12 +36,15 @@ const STATUS_STYLES: Record<string, string> = {
 
 export default function KnowledgePage() {
   const [sources, setSources] = useState<KnowledgeRow[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
       setSources(await engine.listKnowledge());
     } catch {
       toast.error("Could not load knowledge sources.");
+    } finally {
+      setLoaded(true);
     }
   }, []);
 
@@ -88,33 +92,32 @@ export default function KnowledgePage() {
         <CardHeader>
           <CardTitle>Sources</CardTitle>
           <CardDescription>
-            {sources.length} document{sources.length === 1 ? "" : "s"}{" "}
-            ingested.
+            {loaded && sources.length > 0
+              ? `${sources.length} document${sources.length === 1 ? "" : "s"} ingested.`
+              : "Chunked and embedded on ingest — status shows live progress."}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Kind</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Chunks</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sources.length === 0 ? (
+          {!loaded ? (
+            <TableSkeleton />
+          ) : sources.length === 0 ? (
+            <EmptyState
+              icon="knowledge"
+              title="MIITHII knows nothing yet"
+              description="Upload a policy doc or crawl your help center — every answer is built from what lands here."
+            />
+          ) : (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="text-muted-foreground py-8 text-center"
-                  >
-                    Nothing ingested yet — upload a doc or crawl your help
-                    center.
-                  </TableCell>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Kind</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Chunks</TableHead>
                 </TableRow>
-              ) : (
-                sources.map((source) => (
+              </TableHeader>
+              <TableBody>
+                {sources.map((source) => (
                   <TableRow key={source.id}>
                     <TableCell className="max-w-sm truncate font-medium">
                       {source.title}
@@ -133,10 +136,10 @@ export default function KnowledgePage() {
                       {source.chunks}
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
