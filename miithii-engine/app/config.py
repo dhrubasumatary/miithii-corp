@@ -24,7 +24,11 @@ class Settings(BaseSettings):
 
     gemini_api_key: str | None = None
     gemini_model: str = "gemini-3.1-flash-lite"
-    openrouter_api_key: str | None = None  # adapter #2 (dev/failover), not prod PII
+    openrouter_api_key: str | None = None  # alt adapter, not prod PII
+    aimlapi_api_key: str | None = None  # adapter chain primary (paid aggregator)
+    aimlapi_model: str = "google/gemini-flash-latest"
+    aimlapi_base_url: str = "https://api.aimlapi.com/v1"
+    aimlapi_timeout_s: float = 60.0
     classifier_confidence_threshold: float = 0.6
     draft_timeout_s: float = 45.0
     force_deterministic: bool = False  # tests/evals: no network, no cost
