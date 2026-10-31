@@ -52,6 +52,12 @@ export type TeamMember = {
   joined: string;
 };
 
+export type TranscriptionResult = {
+  text: string;
+  language_code: string | null;
+  request_id?: string;
+};
+
 export class EngineError extends Error {
   constructor(
     public status: number,
@@ -211,6 +217,41 @@ export const engine = {
     }),
   analyses: (ticketId: string) =>
     req<AnalysisRow[]>(`/v1/tickets/${ticketId}/analyses`),
+  /**
+   * Dictation: the raw recording IS the request body — no multipart, no
+   * storage engine-side. Content-Type tells the engine which container the
+   * browser wrote so the filename it hands the provider stays honest.
+   */
+  async transcribe(clip: Blob, mimeType: string): Promise<TranscriptionResult> {
+    const headers: Record<string, string> = {
+      "Content-Type": mimeType || "application/octet-stream",
+    };
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        headers["Authorization"] = `Bearer ${data.session.access_token}`;
+      }
+    }
+    if (!headers["Authorization"]) {
+      headers["X-API-Key"] = getApiKey();
+    }
+    const res = await fetch(`${ENGINE_URL}/v1/transcribe`, {
+      method: "POST",
+      headers,
+      body: clip,
+      cache: "no-store",
+    });
+    if (res.status === 401) {
+      handleAuthFailure();
+      throw new EngineError(401, "Invalid or missing API key");
+    }
+    if (!res.ok) {
+      const body = (await res.json().catch(() => ({}))) as { detail?: string };
+      throw new EngineError(res.status, body.detail ?? `Engine error ${res.status}`);
+    }
+    return res.json() as Promise<TranscriptionResult>;
+  },
   listKnowledge: () => req<KnowledgeRow[]>("/v1/knowledge"),
   uploadKnowledge: (title: string, content: string) =>
     req<{ source_id: string; status: string; error: string | null }>(

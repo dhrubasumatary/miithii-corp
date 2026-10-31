@@ -21,6 +21,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState<"email" | "key">("email");
   const [email, setEmail] = useState("");
   const [magicSent, setMagicSent] = useState(false);
+  const [otp, setOtp] = useState("");
   const [keyInput, setKeyInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -56,13 +57,25 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
     if (!supabase || !email.trim()) return;
     setBusy(true);
     setError("");
-    const { error: err } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: { emailRedirectTo: window.location.origin },
-    });
+    const { error: err } = await supabase.auth.signInWithOtp({ email: email.trim() });
     setBusy(false);
     if (err) setError(err.message);
     else setMagicSent(true);
+  }
+
+  async function verifyOtp() {
+    const supabase = getSupabase();
+    if (!supabase || otp.trim().length < 6) return;
+    setBusy(true);
+    setError("");
+    const { error: err } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token: otp.trim(),
+      type: "email",
+    });
+    setBusy(false);
+    if (err) setError(err.message);
+    // onAuthStateChange handles the session + reload
   }
 
   async function saveKey() {

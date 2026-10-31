@@ -20,5 +20,7 @@ services:
         sync: false
       - key: AIMLAPI_API_KEY
         sync: false
+      - key: SARVAM_API_KEY
+        sync: false
       - key: CORS_ORIGINS
         value: "*"

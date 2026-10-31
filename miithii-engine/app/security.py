@@ -58,7 +58,9 @@ async def _verify_supabase_session(token: str) -> dict:
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=503, detail="Auth server unreachable") from exc
 
-    if response.status_code == 401:
+    # Supabase answers 401 OR 403 for an invalid/expired session (403 when
+    # the apikey is valid but the bearer is not) — both mean "bad session".
+    if response.status_code in (401, 403):
         raise HTTPException(status_code=401, detail="Session expired or invalid")
     if response.status_code != 200:
         raise HTTPException(status_code=503, detail="Auth introspection failed")

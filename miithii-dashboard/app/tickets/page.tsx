@@ -1,7 +1,7 @@
 "use client";
 
-import { ArrowUpRight, Check, Copy, RefreshCw, Send } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { ArrowUpRight, Check, Copy, Mic, RefreshCw, Send } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { ActionBadge, FlagBadges } from "@/components/badges";
@@ -10,6 +10,11 @@ import { FadeUp } from "@/components/motion";
 import { EmptyState, TableSkeleton } from "@/components/data-states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { VoiceFace } from "@/components/voice-face";
+import {
+  useVoiceInput,
+  useVoiceInputSupported,
+} from "@/lib/use-voice-input";
 import {
   Card,
   CardContent,
@@ -51,6 +56,19 @@ export default function TicketsPage() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const voiceSupported = useVoiceInputSupported();
+
+  /* The transcript is an append, never an overwrite — dictated words join
+     whatever was already typed, separated the way a sentence would be. */
+  const voice = useVoiceInput({
+    onTranscript: (text) => {
+      setBody((current) =>
+        current.trim() ? `${current.trimEnd()} ${text}` : text,
+      );
+      setTimeout(() => bodyRef.current?.focus(), 0);
+    },
+  });
 
   const refresh = useCallback(async () => {
     try {
@@ -147,20 +165,42 @@ export default function TicketsPage() {
             maxLength={500}
             disabled={analyzing}
           />
-          <div className="flex flex-col gap-1">
-            <Textarea
-              placeholder="What did the customer say? (Ctrl+Enter to run)"
-              value={body}
-              onChange={(event) => setBody(event.target.value)}
-              rows={5}
-              maxLength={10000}
-              disabled={analyzing}
-              className="well resize-none"
-            />
-            <span className="text-muted-foreground self-end text-xs">
-              {body.length}/10,000
-            </span>
-          </div>
+          {voice.status !== "idle" ? (
+            <VoiceFace voice={voice} />
+          ) : (
+            <div className="flex flex-col gap-1">
+              <Textarea
+                ref={bodyRef}
+                placeholder="What did the customer say? (Ctrl+Enter to run)"
+                value={body}
+                onChange={(event) => setBody(event.target.value)}
+                rows={5}
+                maxLength={10000}
+                disabled={analyzing}
+                className="well resize-none"
+              />
+              <div className="flex items-center justify-between">
+                {voiceSupported ? (
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label="Dictate the message with your voice"
+                    title="Dictate with your voice"
+                    onClick={voice.start}
+                    disabled={analyzing}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <Mic className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <span />
+                )}
+                <span className="text-muted-foreground text-xs">
+                  {body.length}/10,000
+                </span>
+              </div>
+            </div>
+          )}
           {error ? <p className="text-destructive text-sm">{error}</p> : null}
           <Button
             onClick={() => void analyze()}
@@ -257,7 +297,7 @@ export default function TicketsPage() {
         <CardHeader>
           <CardTitle>Queue</CardTitle>
           <CardDescription>
-            Everything you've run. Click a row for its trail.
+            Everything you&apos;ve run. Click a row for its trail.
           </CardDescription>
         </CardHeader>
         <CardContent>
