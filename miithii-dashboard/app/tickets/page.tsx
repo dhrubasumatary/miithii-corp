@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { ActionBadge, FlagBadges } from "@/components/badges";
 import { AnalyzeProgress } from "@/components/analyze-progress";
+import { FadeUp } from "@/components/motion";
 import { EmptyState, TableSkeleton } from "@/components/data-states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -111,6 +112,7 @@ export default function TicketsPage() {
         </Button>
       </div>
 
+      <FadeUp delay={0.04}>
       <Card>
         <CardHeader>
           <CardTitle>New ticket</CardTitle>
@@ -147,13 +149,14 @@ export default function TicketsPage() {
           <Button
             onClick={() => void analyze()}
             disabled={analyzing || !subject.trim() || !body.trim()}
-            className="self-start"
+            className="self-start transition-transform active:scale-[0.98]"
           >
             <Send className="h-4 w-4" />
             {analyzing ? "Analyzing…" : "Analyze ticket"}
           </Button>
         </CardContent>
       </Card>
+      </FadeUp>
 
       {analyzing ? (
         <Card>
@@ -170,6 +173,7 @@ export default function TicketsPage() {
       ) : null}
 
       {result && !analyzing ? (
+        <FadeUp>
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -230,8 +234,10 @@ export default function TicketsPage() {
             ) : null}
           </CardContent>
         </Card>
+        </FadeUp>
       ) : null}
 
+      <FadeUp delay={0.08}>
       <Card>
         <CardHeader>
           <CardTitle>Queue</CardTitle>
@@ -267,6 +273,7 @@ export default function TicketsPage() {
           )}
         </CardContent>
       </Card>
+      </FadeUp>
     </div>
   );
 }

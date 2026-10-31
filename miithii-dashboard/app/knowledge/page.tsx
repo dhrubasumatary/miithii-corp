@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { EmptyState, TableSkeleton } from "@/components/data-states";
+import { FadeUp } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -81,10 +82,14 @@ export default function KnowledgePage() {
         </TabsList>
 
         <TabsContent value="upload">
-          <UploadCard onDone={refresh} />
+          <FadeUp>
+            <UploadCard onDone={refresh} />
+          </FadeUp>
         </TabsContent>
         <TabsContent value="crawl">
-          <CrawlCard onDone={refresh} />
+          <FadeUp>
+            <CrawlCard onDone={refresh} />
+          </FadeUp>
         </TabsContent>
       </Tabs>
 
