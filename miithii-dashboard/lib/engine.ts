@@ -1,3 +1,5 @@
+import { getSupabase } from "./supabase";
+
 export type AnalysisResult = {
   ticket_id: string;
   category: string;
@@ -42,6 +44,14 @@ export type KnowledgeRow = {
   created_at: string;
 };
 
+export type TeamMember = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  joined: string;
+};
+
 export class EngineError extends Error {
   constructor(
     public status: number,
@@ -67,13 +77,23 @@ function handleAuthFailure() {
 }
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  // named human (Supabase session) beats the shared workspace key
+  const supabase = getSupabase();
+  if (supabase) {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      headers["Authorization"] = `Bearer ${data.session.access_token}`;
+    }
+  }
+  if (!headers["Authorization"]) {
+    headers["X-API-Key"] = getApiKey();
+  }
   const res = await fetch(`${ENGINE_URL}${path}`, {
     ...init,
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-Key": getApiKey(),
-      ...(init?.headers ?? {}),
-    },
+    headers: { ...headers, ...(init?.headers ?? {}) },
     cache: "no-store",
   });
   if (res.status === 401) {
@@ -109,6 +129,12 @@ export const engine = {
     return res.ok;
   },
   usage: () => req<UsageSummary>("/v1/usage"),
+  listUsers: () => req<TeamMember[]>("/v1/users"),
+  inviteUser: (email: string) =>
+    req<TeamMember>("/v1/users", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
   async signup(company: string, email: string): Promise<{ tenant_id: string; api_key: string }> {
     const res = await fetch(`${ENGINE_URL}/v1/signup`, {
       method: "POST",

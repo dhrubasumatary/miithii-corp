@@ -243,6 +243,7 @@ class Analysis(Base, TimestampMixin):
     citations: Mapped[list] = mapped_column(
         JSONB, default=list, server_default=text("'[]'::jsonb"), nullable=False
     )
+    user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id"))
     confidence: Mapped[float | None] = mapped_column(Float)
     latency_ms: Mapped[int | None] = mapped_column(Integer)
     prompt_tokens: Mapped[int | None] = mapped_column(Integer)

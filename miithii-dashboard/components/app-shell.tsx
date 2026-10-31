@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, BookOpen, KeyRound, Loader2, Ticket } from "lucide-react";
+import { BarChart3, BookOpen, KeyRound, Loader2, Ticket, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -14,6 +14,7 @@ const LINKS = [
   { href: "/tickets", label: "Tickets", icon: Ticket },
   { href: "/knowledge", label: "Knowledge", icon: BookOpen },
   { href: "/usage", label: "Usage", icon: BarChart3 },
+  { href: "/team", label: "Team", icon: Users },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {

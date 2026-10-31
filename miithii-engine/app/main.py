@@ -111,10 +111,12 @@ def create_app() -> FastAPI:
     from app.routes.knowledge import router as knowledge_router
     from app.routes.signup import router as signup_router
     from app.routes.usage import router as usage_router
+    from app.routes.users import router as users_router
 
     app.include_router(knowledge_router)
     app.include_router(signup_router)
     app.include_router(usage_router)
+    app.include_router(users_router)
     return app
 
 

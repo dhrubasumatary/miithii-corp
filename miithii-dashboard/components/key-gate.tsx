@@ -1,92 +1,170 @@
 "use client";
 
+import { BookOpen, Check, FileText, KeyRound, Mail, Receipt, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import {
-  BookOpen,
-  Check,
-  FileText,
-  Receipt,
-  ShieldCheck,
-} from "lucide-react";
+import { useEffect, useState } from "react";
 
+import { FadeUp } from "@/components/motion";
+import { HeroDemo } from "@/components/hero-demo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { HeroDemo } from "@/components/hero-demo";
-import { ENGINE_URL, KEY_STORAGE, engine } from "@/lib/engine";
+import { ENGINE_URL, KEY_STORAGE, engine, getApiKey } from "@/lib/engine";
+import { getSupabase } from "@/lib/supabase";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-function FadeUp({ children, delay = 0, className }: { children: React.ReactNode; delay?: number; className?: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.3, delay, ease: EASE }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
 export function KeyGate({ children }: { children: React.ReactNode }) {
   const [key, setKey] = useState<string | null>(null);
+  const [signedIn, setSignedIn] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
-  const [input, setInput] = useState("");
+  const [mode, setMode] = useState<"email" | "key">("email");
+  const [email, setEmail] = useState("");
+  const [magicSent, setMagicSent] = useState(false);
+  const [keyInput, setKeyInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setKey(localStorage.getItem(KEY_STORAGE));
+    const supabase = getSupabase();
+    if (supabase) {
+      void supabase.auth.getSession().then(({ data }) => {
+        if (data.session) setSignedIn(data.session.access_token);
+        setReady(true);
+      });
+      const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === "SIGNED_IN" && session) {
+          setSignedIn(session.access_token);
+          window.location.reload();
+        }
+      });
+      return () => sub.subscription.unsubscribe();
+    }
+    setKey(getApiKey());
     setReady(true);
+    return undefined;
   }, []);
 
   if (!ready) return null;
-  if (key) return <>{children}</>;
+  if (key || signedIn) return <>{children}</>;
 
-  async function save() {
-    if (!input.trim()) return;
+  const hasSupabase = getSupabase() !== null;
+  const emailMode = mode === "email" && hasSupabase;
+
+  async function sendMagicLink() {
+    const supabase = getSupabase();
+    if (!supabase || !email.trim()) return;
+    setBusy(true);
+    setError("");
+    const { error: err } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { emailRedirectTo: window.location.origin },
+    });
+    setBusy(false);
+    if (err) setError(err.message);
+    else setMagicSent(true);
+  }
+
+  async function saveKey() {
+    if (!keyInput.trim()) return;
     setBusy(true);
     setError("");
     try {
-      const ok = await engine.verifyKey(input.trim());
+      const ok = await engine.verifyKey(keyInput.trim());
       if (!ok) throw new Error("That key didn't work");
-      localStorage.setItem(KEY_STORAGE, input.trim());
-      setKey(input.trim());
+      localStorage.setItem(KEY_STORAGE, keyInput.trim());
+      setKey(keyInput.trim());
     } catch (err) {
-      setError(err instanceof Error ? `${err.message} — engine: ${ENGINE_URL}` : "Verification failed");
+      setError(err instanceof Error ? err.message : "Verification failed");
     } finally {
       setBusy(false);
     }
   }
 
-  const keyForm = (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault();
-        void save();
-      }}
-      className="mx-auto flex w-full max-w-md items-center gap-2 rounded-full border border-white/10 bg-black/40 p-1.5 backdrop-blur"
-    >
-      <Input
-        type="password"
-        value={input}
-        onChange={(event) => setInput(event.target.value)}
-        placeholder="Workspace key — mii_…"
-        className="h-10 flex-1 border-0 bg-transparent px-4 shadow-none focus-visible:ring-0"
-      />
-      <Button
-        type="submit"
-        disabled={busy || !input.trim()}
-        className="h-10 rounded-full bg-white px-5 font-medium text-[#0B1120] hover:bg-white/90"
+  function authPanel() {
+    if (magicSent) {
+      return (
+        <div className="bg-card mx-auto max-w-md rounded-2xl border p-6">
+          <p className="flex items-center justify-center gap-2 font-medium">
+            <Mail className="text-[#6B84FF] h-4 w-4" />
+            Check your inbox
+          </p>
+          <p className="text-muted-foreground mt-2 text-sm">
+            We sent a sign-in link to {email}. Open it on this device.
+          </p>
+        </div>
+      );
+    }
+    return emailMode ? (
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          void sendMagicLink();
+        }}
+        className="mx-auto flex w-full max-w-md items-center gap-2 rounded-full border border-white/10 bg-black/40 p-1.5 backdrop-blur"
       >
-        {busy ? "Checking…" : "Open"}
-      </Button>
-    </form>
-  );
+        <Input
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="you@company.com"
+          className="h-10 flex-1 border-0 bg-transparent px-4 shadow-none focus-visible:ring-0"
+        />
+        <Button
+          type="submit"
+          disabled={busy || !email.trim()}
+          className="h-10 rounded-full bg-white px-5 font-medium text-[#0B1120] hover:bg-white/90"
+        >
+          {busy ? "Sending…" : "Sign in"}
+        </Button>
+      </form>
+    ) : (
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          void saveKey();
+        }}
+        className="mx-auto flex w-full max-w-md items-center gap-2 rounded-full border border-white/10 bg-black/40 p-1.5 backdrop-blur"
+      >
+        <Input
+          type="password"
+          value={keyInput}
+          onChange={(event) => setKeyInput(event.target.value)}
+          placeholder="Workspace key — mii_…"
+          className="h-10 flex-1 border-0 bg-transparent px-4 shadow-none focus-visible:ring-0"
+        />
+        <Button
+          type="submit"
+          disabled={busy || !keyInput.trim()}
+          className="h-10 rounded-full bg-white px-5 font-medium text-[#0B1120] hover:bg-white/90"
+        >
+          {busy ? "Checking…" : "Open"}
+        </Button>
+      </form>
+    );
+  }
+
+  function authToggle() {
+    return hasSupabase ? (
+      <button
+        type="button"
+        onClick={() => setMode(mode === "email" ? "key" : "email")}
+        className="text-muted-foreground inline-flex items-center gap-1.5 text-xs hover:text-foreground"
+      >
+        {mode === "email" ? (
+          <>
+            <KeyRound className="h-3.5 w-3.5" />
+            Use a workspace key instead
+          </>
+        ) : (
+          <>
+            <Mail className="h-3.5 w-3.5" />
+            Sign in with work email
+          </>
+        )}
+      </button>
+    ) : null;
+  }
 
   return (
     <div className="relative min-h-svh overflow-hidden">
@@ -100,7 +178,6 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
       />
 
       <div className="relative mx-auto max-w-4xl px-6">
-        {/* ---------- hero ---------- */}
         <div className="fixed inset-x-0 top-5 z-20 flex justify-center">
           <div className="flex h-11 items-center gap-2.5 rounded-full border border-white/10 bg-black/50 px-5 backdrop-blur">
             <img src="/miithii-mark.svg" alt="" className="h-5 w-5 rounded" />
@@ -116,11 +193,16 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           <p className="text-muted-foreground mt-5 max-w-xl text-lg">
             Grounded in your docs. Checked by your rules. Sent by you.
           </p>
-          <div className="mt-9 w-full">{keyForm}</div>
+          <div className="mt-9 w-full">{authPanel()}</div>
           {error ? <p className="text-destructive mt-3 text-sm">{error}</p> : null}
+          <div className="mt-4">{authToggle()}</div>
+          <p className="mt-4 text-sm">
+            <Link href="/signup" className="text-[#6B84FF] hover:underline">
+              No key? Create your workspace →
+            </Link>
+          </p>
         </div>
 
-        {/* the product is the hero — live, not a screenshot */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -137,7 +219,6 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           </div>
         </motion.div>
 
-        {/* ---------- claim 1: grounded ---------- */}
         <FadeUp className="mt-32">
           <h2 className="text-center text-3xl font-semibold tracking-tight">
             Grounded in your docs.
@@ -174,7 +255,6 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           </div>
         </FadeUp>
 
-        {/* ---------- claim 2: checked ---------- */}
         <FadeUp className="mt-32">
           <h2 className="text-center text-3xl font-semibold tracking-tight">
             Checked by your rules.
@@ -218,7 +298,6 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           </div>
         </FadeUp>
 
-        {/* ---------- claim 3: nothing hides ---------- */}
         <FadeUp className="mt-32">
           <h2 className="text-center text-3xl font-semibold tracking-tight">
             Nothing hides.
@@ -254,7 +333,6 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           </div>
         </FadeUp>
 
-        {/* ---------- metrics strip ---------- */}
         <FadeUp className="mt-32">
           <div className="grid gap-4 text-center sm:grid-cols-3">
             {[
@@ -270,12 +348,12 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           </div>
         </FadeUp>
 
-        {/* ---------- closing ---------- */}
         <FadeUp className="mt-32 mb-16 flex flex-col items-center gap-6 text-center">
           <h2 className="text-3xl font-semibold tracking-tight">
             Ready for drafts that wait for a person?
           </h2>
-          <div className="w-full">{keyForm}</div>
+          <div className="w-full">{authPanel()}</div>
+          <div>{authToggle()}</div>
           <p className="mt-2 text-sm">
             <Link href="/signup" className="text-[#6B84FF] hover:underline">
               No key? Create your workspace →

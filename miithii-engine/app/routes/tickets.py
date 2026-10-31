@@ -17,8 +17,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
 from app.domain import AnalysisResponse, TicketCreate
-from app.models import Analysis, Tenant, Ticket
-from app.security import require_tenant
+from app.models import Analysis, Ticket
+from app.security import Principal, require_principal
 
 router = APIRouter(prefix="/v1/tickets", tags=["tickets"])
 
@@ -27,7 +27,7 @@ router = APIRouter(prefix="/v1/tickets", tags=["tickets"])
 async def create_ticket(
     payload: TicketCreate,
     request: Request,
-    tenant: Tenant = Depends(require_tenant),
+    principal: Principal = Depends(require_principal),
     session: AsyncSession = Depends(get_session),
 ) -> AnalysisResponse:
     documents: dict[str, str] = {}
@@ -45,11 +45,12 @@ async def create_ticket(
 
     return await request.app.state.analyzer.analyze(
         session,
-        tenant,
+        principal.tenant,
         subject=payload.subject,
         body=payload.body,
         request_id=request.headers.get("x-request-id"),
         documents=documents,
+        user_id=principal.user.id if principal.user else None,
     )
 
 
@@ -57,7 +58,7 @@ async def create_ticket(
 async def create_ticket_stream(
     payload: TicketCreate,
     request: Request,
-    tenant: Tenant = Depends(require_tenant),
+    principal: Principal = Depends(require_principal),
     session: AsyncSession = Depends(get_session),
 ) -> StreamingResponse:
     """SSE: real pipeline stages (classify -> retrieve -> policy -> draft) + result."""
@@ -87,7 +88,7 @@ async def create_ticket_stream(
             task = asyncio.create_task(
                 request.app.state.analyzer.analyze(
                     session,
-                    tenant,
+                    principal.tenant,
                     subject=payload.subject,
                     body=payload.body,
                     request_id=request.headers.get("x-request-id"),
@@ -119,7 +120,7 @@ async def create_ticket_stream(
 
 @router.get("")
 async def list_tickets(
-    tenant: Tenant = Depends(require_tenant),
+    principal: Principal = Depends(require_principal),
     session: AsyncSession = Depends(get_session),
 ) -> list[dict]:
     rows = (
@@ -141,7 +142,7 @@ async def list_tickets(
 @router.get("/{ticket_id}/analyses")
 async def ticket_analyses(
     ticket_id: uuid.UUID,
-    tenant: Tenant = Depends(require_tenant),
+    principal: Principal = Depends(require_principal),
     session: AsyncSession = Depends(get_session),
 ) -> list[dict]:
     rows = (

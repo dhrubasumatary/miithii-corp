@@ -46,6 +46,7 @@ class TicketAnalyzer:
         request_id: str | None = None,
         documents: dict[str, str] | None = None,
         progress=None,
+        user_id=None,
     ) -> AnalysisResponse:
         start = time.perf_counter()
 
@@ -124,6 +125,7 @@ class TicketAnalyzer:
         analysis = Analysis(
             tenant_id=tenant.id,
             ticket_id=ticket.id,
+            user_id=user_id,
             category=category.value,
             severity=severity.value,
             difficulty=difficulty.value,
