@@ -41,7 +41,7 @@ class AIMLAPIProvider(Provider):
         self._timeout_s = timeout_s
         self._max_tokens = max_tokens
 
-    async def _complete(self, prompt: str, schema_name: str, schema: dict) -> dict:
+    async def _complete(self, prompt: str, schema_name: str, schema: dict) -> tuple[dict, dict]:
         payload = {
             "model": self._model,
             "messages": [{"role": "user", "content": prompt}],
@@ -85,7 +85,12 @@ class AIMLAPIProvider(Provider):
                         last = ProviderError("aimlapi empty content (reasoning budget exhausted)")
                         logger.warning("provider_empty_content", attempt=attempt + 1)
                     else:
-                        return self._parse_json(str(content))
+                        usage = response.json().get("usage", {}) or {}
+                        tokens = {
+                            "prompt_tokens": usage.get("prompt_tokens"),
+                            "completion_tokens": usage.get("completion_tokens"),
+                        }
+                        return self._parse_json(str(content)), tokens
             if attempt < _MAX_ATTEMPTS - 1:
                 await asyncio.sleep(2**attempt)
         assert last is not None
@@ -101,8 +106,10 @@ class AIMLAPIProvider(Provider):
 
     async def classify(self, subject: str, body: str) -> ClassifierResult | None:
         prompt = CLASSIFY_PROMPT.format(subject=subject, body=body)
-        data = await self._complete(prompt, "classify", ClassifierResult.model_json_schema())
-        return ClassifierResult.model_validate(data)
+        data, tokens = await self._complete(
+            prompt, "classify", ClassifierResult.model_json_schema()
+        )
+        return ClassifierResult.model_validate({**data, **tokens})
 
     async def draft(self, context: DraftContext) -> DraftResult:
         documents = (
@@ -116,5 +123,5 @@ class AIMLAPIProvider(Provider):
             body=context.body,
             documents=documents,
         )
-        data = await self._complete(prompt, "draft", DraftResult.model_json_schema())
-        return DraftResult.model_validate(data)
+        data, tokens = await self._complete(prompt, "draft", DraftResult.model_json_schema())
+        return DraftResult.model_validate({**data, **tokens})

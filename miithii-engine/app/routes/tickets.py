@@ -5,10 +5,13 @@ the caller's RLS binding, so a ticket_id from another tenant is simply
 invisible (empty result), not a leak.
 """
 
+import asyncio
+import json
 import uuid
 
 import structlog
 from fastapi import APIRouter, Depends, Request
+from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -47,6 +50,70 @@ async def create_ticket(
         body=payload.body,
         request_id=request.headers.get("x-request-id"),
         documents=documents,
+    )
+
+
+@router.post("/stream")
+async def create_ticket_stream(
+    payload: TicketCreate,
+    request: Request,
+    tenant: Tenant = Depends(require_tenant),
+    session: AsyncSession = Depends(get_session),
+) -> StreamingResponse:
+    """SSE: real pipeline stages (classify -> retrieve -> policy -> draft) + result."""
+
+    async def generate():
+        def sse(event: str, data: dict) -> str:
+            return f"event: {event}\ndata: {json.dumps(data)}\n\n"
+
+        try:
+            yield sse("progress", {"stage": "classify"})
+
+            documents: dict[str, str] = {}
+            retriever = getattr(request.app.state, "retriever", None)
+            if retriever is not None:
+                try:
+                    docs = await retriever.retrieve(
+                        session,
+                        query=f"{payload.subject}\n{payload.body}",
+                        k=3,
+                    )
+                    documents = {d["citation"]: d["content"] for d in docs}
+                except Exception as exc:  # noqa: BLE001
+                    structlog.get_logger(__name__).warning("retrieval_failed", error=str(exc)[:200])
+            yield sse("progress", {"stage": "retrieve"})
+
+            queue: asyncio.Queue = asyncio.Queue()
+            task = asyncio.create_task(
+                request.app.state.analyzer.analyze(
+                    session,
+                    tenant,
+                    subject=payload.subject,
+                    body=payload.body,
+                    request_id=request.headers.get("x-request-id"),
+                    documents=documents,
+                    progress=queue.put_nowait,
+                )
+            )
+            while True:
+                getter = asyncio.create_task(queue.get())
+                done, _ = await asyncio.wait(
+                    {task, getter}, return_when=asyncio.FIRST_COMPLETED
+                )
+                if getter in done:
+                    yield sse("progress", {"stage": getter.result()})
+                if task in done:
+                    result = task.result()
+                    break
+
+            yield sse("result", result.model_dump())
+        except Exception as exc:  # noqa: BLE001 - stream the failure, never hang
+            yield sse("error", {"detail": str(exc)[:300]})
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
 

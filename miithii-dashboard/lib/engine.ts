@@ -87,6 +87,19 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+export type UsageDay = {
+  day: string;
+  events: number;
+  prompt_tokens: number;
+  completion_tokens: number;
+  cost_usd: number;
+};
+
+export type UsageSummary = {
+  days: UsageDay[];
+  totals: { events: number; prompt_tokens: number; completion_tokens: number; cost_usd: number };
+};
+
 export const engine = {
   async verifyKey(key: string): Promise<boolean> {
     const res = await fetch(`${ENGINE_URL}/v1/tickets`, {
@@ -95,7 +108,63 @@ export const engine = {
     });
     return res.ok;
   },
+  usage: () => req<UsageSummary>("/v1/usage"),
   listTickets: () => req<TicketRow[]>("/v1/tickets"),
+  /**
+   * Streams the real pipeline stages over SSE (classify -> retrieve ->
+   * policy -> draft) and resolves with the final analysis.
+   */
+  async createTicketStream(
+    subject: string,
+    body: string,
+    onStage?: (stage: string) => void,
+  ): Promise<AnalysisResult> {
+    const res = await fetch(`${ENGINE_URL}/v1/tickets/stream`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "text/event-stream",
+        "X-API-Key": getApiKey(),
+      },
+      body: JSON.stringify({ subject, body }),
+    });
+    if (res.status === 401) {
+      handleAuthFailure();
+      throw new EngineError(401, "Invalid or missing API key");
+    }
+    if (!res.ok || !res.body) {
+      throw new EngineError(res.status, `Engine error ${res.status}`);
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let result: AnalysisResult | null = null;
+
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      let boundary: number;
+      while ((boundary = buffer.indexOf("\n\n")) !== -1) {
+        const raw = buffer.slice(0, boundary);
+        buffer = buffer.slice(boundary + 2);
+        let event = "message";
+        let data = "";
+        for (const line of raw.split("\n")) {
+          if (line.startsWith("event:")) event = line.slice(6).trim();
+          else if (line.startsWith("data:")) data += line.slice(5).trim();
+        }
+        if (!data) continue;
+        const parsed = JSON.parse(data) as { stage?: string; detail?: string };
+        if (event === "progress" && parsed.stage) onStage?.(parsed.stage);
+        else if (event === "result") result = parsed as unknown as AnalysisResult;
+        else if (event === "error")
+          throw new EngineError(500, parsed.detail ?? "Stream failed");
+      }
+    }
+    if (!result) throw new EngineError(500, "Stream ended without a result");
+    return result;
+  },
   createTicket: (subject: string, body: string) =>
     req<AnalysisResult>("/v1/tickets", {
       method: "POST",

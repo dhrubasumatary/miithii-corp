@@ -107,7 +107,15 @@ class GeminiProvider(Provider):
             },
         )
         data = self._parse_json(self._output_text(response))
-        return ClassifierResult.model_validate(data)
+        result = ClassifierResult.model_validate(data)
+        usage = getattr(response, "usage", None)
+        result.prompt_tokens = getattr(usage, "prompt_tokens", None) or getattr(
+            usage, "input_tokens", None
+        )
+        result.completion_tokens = getattr(usage, "completion_tokens", None) or getattr(
+            usage, "output_tokens", None
+        )
+        return result
 
     async def draft(self, context: DraftContext) -> DraftResult:
         documents = (
@@ -132,4 +140,12 @@ class GeminiProvider(Provider):
             },
         )
         data = self._parse_json(self._output_text(response))
-        return DraftResult.model_validate(data)
+        result = DraftResult.model_validate(data)
+        usage = getattr(response, "usage", None)
+        result.prompt_tokens = getattr(usage, "prompt_tokens", None) or getattr(
+            usage, "input_tokens", None
+        )
+        result.completion_tokens = getattr(usage, "completion_tokens", None) or getattr(
+            usage, "output_tokens", None
+        )
+        return result

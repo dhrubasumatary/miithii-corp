@@ -11,6 +11,7 @@ import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.classifier import KeywordClassifier
+from app.costs import estimate_cost
 from app.domain import (
     AnalysisResponse,
     ClassifierResult,
@@ -44,6 +45,7 @@ class TicketAnalyzer:
         body: str,
         request_id: str | None = None,
         documents: dict[str, str] | None = None,
+        progress=None,
     ) -> AnalysisResponse:
         start = time.perf_counter()
 
@@ -70,6 +72,9 @@ class TicketAnalyzer:
             else:
                 tags.append("ambiguous")  # low confidence -> CLARIFY path (ADR-007)
 
+        if progress is not None:
+            progress("policy")
+
         # 2) policy — deterministic, authoritative
         decision: PolicyDecision = self._policy.evaluate(tags, tenant.policy_config)
 
@@ -81,6 +86,9 @@ class TicketAnalyzer:
             flags=decision.flags,
             documents=documents or {},
         )
+        if progress is not None:
+            progress("draft")
+
         draft = None
         used_provider = provider_name
         used_model = getattr(self._provider, "_model", "deterministic")
@@ -127,6 +135,7 @@ class TicketAnalyzer:
             latency_ms=latency_ms,
             prompt_tokens=draft.prompt_tokens,
             completion_tokens=draft.completion_tokens,
+            cost_usd=estimate_cost(used_model, draft.prompt_tokens, draft.completion_tokens),
             provider=used_provider,
             model=used_model,
             prompt_version=_PROMPT_VERSION,
@@ -140,6 +149,7 @@ class TicketAnalyzer:
                 model=used_model,
                 prompt_tokens=draft.prompt_tokens,
                 completion_tokens=draft.completion_tokens,
+                cost_usd=estimate_cost(used_model, draft.prompt_tokens, draft.completion_tokens),
                 latency_ms=latency_ms,
                 request_id=request_id,
             )

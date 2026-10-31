@@ -105,8 +105,10 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(tickets_router)
     from app.routes.knowledge import router as knowledge_router
+    from app.routes.usage import router as usage_router
 
     app.include_router(knowledge_router)
+    app.include_router(usage_router)
     return app
 
 

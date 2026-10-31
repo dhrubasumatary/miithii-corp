@@ -1,47 +1,38 @@
 "use client";
 
 import { BookOpen, Check, Loader2, PenLine, ScanSearch, ShieldCheck } from "lucide-react";
-import { useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
-const STEPS = [
-  { label: "Classifying ticket", icon: ScanSearch },
-  { label: "Applying support policy", icon: ShieldCheck },
-  { label: "Retrieving knowledge", icon: BookOpen },
-  { label: "Drafting response", icon: PenLine },
+const STAGES: { key: string; label: string; icon: typeof ScanSearch }[] = [
+  { key: "classify", label: "Classifying ticket", icon: ScanSearch },
+  { key: "retrieve", label: "Retrieving knowledge", icon: BookOpen },
+  { key: "policy", label: "Applying support policy", icon: ShieldCheck },
+  { key: "draft", label: "Drafting response", icon: PenLine },
 ];
 
 /**
- * Perceived-progress stepper shown while the real analysis runs.
- * Advances on a timer (the pipeline is a single call), then the result
- * replaces it — the wait feels engineered instead of hung.
+ * Stepper driven by the ENGINE'S REAL stage events over SSE — not a timer.
+ * Each check appears when the pipeline actually completes that stage.
  */
-export function AnalyzeProgress({ active }: { active: boolean }) {
-  const [step, setStep] = useState(0);
-
-  useEffect(() => {
-    if (!active) {
-      setStep(0);
-      return;
-    }
-    const timer = setInterval(
-      () => setStep((s) => Math.min(s + 1, STEPS.length - 1)),
-      3500,
-    );
-    return () => clearInterval(timer);
-  }, [active]);
-
+export function AnalyzeProgress({
+  active,
+  current,
+}: {
+  active: boolean;
+  current: string | null;
+}) {
   if (!active) return null;
+  const currentIdx = Math.max(0, STAGES.findIndex((s) => s.key === current));
 
   return (
     <ol className="flex flex-col gap-1 py-2">
-      {STEPS.map((entry, index) => {
-        const done = index < step;
-        const current = index === step;
+      {STAGES.map((stage, index) => {
+        const done = index < currentIdx;
+        const current = index === currentIdx && active;
         return (
           <li
-            key={entry.label}
+            key={stage.key}
             className={cn(
               "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
               current && "bg-muted",
@@ -53,9 +44,9 @@ export function AnalyzeProgress({ active }: { active: boolean }) {
             ) : current ? (
               <Loader2 className="text-primary h-4 w-4 animate-spin" />
             ) : (
-              <entry.icon className="h-4 w-4" />
+              <stage.icon className="h-4 w-4" />
             )}
-            <span className={cn(current && "font-medium")}>{entry.label}</span>
+            <span className={cn(current && "font-medium")}>{stage.label}</span>
             {current ? (
               <span className="text-muted-foreground ml-auto text-xs">
                 working…

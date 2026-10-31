@@ -45,6 +45,7 @@ export default function TicketsPage() {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
+  const [stage, setStage] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
@@ -72,8 +73,11 @@ export default function TicketsPage() {
     setError("");
     setResult(null);
     setCopied(false);
+    setStage("classify");
     try {
-      const analysis = await engine.createTicket(subject.trim(), body.trim());
+      const analysis = await engine.createTicketStream(subject.trim(), body.trim(), (s) =>
+        setStage(s),
+      );
       setResult(analysis);
       toast.success(`Analyzed — action: ${analysis.action.replaceAll("_", " ")}`);
       await refresh();
@@ -86,6 +90,7 @@ export default function TicketsPage() {
       toast.error(message);
     } finally {
       setAnalyzing(false);
+      setStage(null);
     }
   }
 
@@ -167,7 +172,7 @@ export default function TicketsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <AnalyzeProgress active={analyzing} />
+            <AnalyzeProgress active={analyzing} current={stage} />
           </CardContent>
         </Card>
       ) : null}

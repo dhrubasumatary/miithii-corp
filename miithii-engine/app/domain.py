@@ -45,6 +45,8 @@ class ClassifierResult(BaseModel):
     difficulty: TicketDifficulty = TicketDifficulty.EASY
     tags: list[str] = Field(default_factory=list)
     confidence: float = Field(default=1.0, ge=0.0, le=1.0)
+    prompt_tokens: int | None = None
+    completion_tokens: int | None = None
 
 
 class PolicyDecision(BaseModel):
