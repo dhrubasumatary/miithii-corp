@@ -117,6 +117,9 @@ def create_app() -> FastAPI:
     app.include_router(signup_router)
     app.include_router(usage_router)
     app.include_router(users_router)
+    from app.routes.transcribe import router as transcribe_router
+
+    app.include_router(transcribe_router)
     return app
 
 

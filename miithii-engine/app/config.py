@@ -33,8 +33,10 @@ class Settings(BaseSettings):
     draft_timeout_s: float = 45.0
     embedding_model: str = "gemini-embedding-001"
     # text-embedding-004 was retired from the API (2026); gemini-embedding-001 is current
-    supabase_url: str | None = None  # https://PROJECTREF.supabase.co
-    supabase_publishable_key: str | None = None  # for session introspection
+    # public-by-design values (same ones the browser holds) — secrets stay in env
+    supabase_url: str | None = "https://qvdvnnejvljggktvflyl.supabase.co"
+    supabase_publishable_key: str | None = "sb_publishable_2KxtBeuveVnNBI2dib_8nQ_9MSNVlPq"  # noqa: E501 - for session introspection
+    sarvam_api_key: str | None = None  # voice dictation (saaras:v4) — server-side only
     force_deterministic: bool = False  # tests/evals: no network, no cost
     host: str = "0.0.0.0"
     port: int = 8000
