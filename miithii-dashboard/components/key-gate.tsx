@@ -276,6 +276,11 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             Ready for drafts that wait for a person?
           </h2>
           <div className="w-full">{keyForm}</div>
+          <p className="mt-2 text-sm">
+            <Link href="/signup" className="text-[#6B84FF] hover:underline">
+              No key? Create your workspace →
+            </Link>
+          </p>
           <p className="text-muted-foreground text-xs">
             মিথি — to understand. Every draft waits for a person. Nothing sends itself.
           </p>
