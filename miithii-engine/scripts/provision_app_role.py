@@ -67,16 +67,19 @@ def main() -> int:
         exists = conn.execute("SELECT 1 FROM pg_roles WHERE rolname = %s", (ROLE,)).fetchone()
         if exists:
             conn.execute(f"ALTER ROLE {ROLE} LOGIN PASSWORD '{password}' NOBYPASSRLS")
-            print(f"role {ROLE} already existed — password rotated")
+            if not args.no_env_write:
+                print(f"role {ROLE} already existed — password rotated")
         else:
             conn.execute(f"CREATE ROLE {ROLE} LOGIN PASSWORD '{password}' NOSUPERUSER NOBYPASSRLS")
-            print(f"role {ROLE} created")
+            if not args.no_env_write:
+                print(f"role {ROLE} created")
         for stmt in grants:
             conn.execute(stmt)
 
     app_url = build_app_url(admin_url, password)
 
     if args.no_env_write:
+        # CI consumes stdout as the app URL — nothing else may print to it
         print(app_url)
         return 0
 
