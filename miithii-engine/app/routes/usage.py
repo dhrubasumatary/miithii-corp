@@ -1,7 +1,7 @@
 """GET /v1/usage — per-tenant consumption and cost aggregates (14 days)."""
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
@@ -28,7 +28,8 @@ async def usage(
             )
             .where(
                 UsageEvent.tenant_id == tenant.id,
-                UsageEvent.created_at >= func.now() - func.interval("14 days"),
+                # func.interval() compiles to invalid PG SQL — literal fragment
+                text("usage_events.created_at >= now() - interval '14 days'"),
             )
             .group_by(day)
             .order_by(day.desc())
