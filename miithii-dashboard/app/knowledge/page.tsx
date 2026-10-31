@@ -59,8 +59,7 @@ export default function KnowledgePage() {
         <div>
           <h1 className="text-lg font-semibold">Knowledge</h1>
           <p className="text-muted-foreground text-sm">
-            Everything MIITHII knows comes from here — answers cite these
-            documents.
+            The docs your drafts come from.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={() => void refresh()}>
@@ -108,8 +107,8 @@ export default function KnowledgePage() {
           ) : sources.length === 0 ? (
             <EmptyState
               icon="knowledge"
-              title="MIITHII knows nothing yet"
-              description="Upload a policy doc or crawl your help center — every answer is built from what lands here."
+              title="Nothing learned yet"
+              description="Add a doc or crawl your help center — drafts cite whatever lands here."
             />
           ) : (
             <Table>
@@ -180,7 +179,7 @@ function UploadCard({ onDone }: { onDone: () => Promise<void> }) {
       <CardHeader>
         <CardTitle>Upload a document</CardTitle>
         <CardDescription>
-          Markdown or plain text — chunked and embedded on ingest.
+          Markdown or plain text. Chunked and embedded the moment it lands.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -244,8 +243,7 @@ function CrawlCard({ onDone }: { onDone: () => Promise<void> }) {
       <CardHeader>
         <CardTitle>Crawl a help center</CardTitle>
         <CardDescription>
-          A page URL, or a sitemap (.xml) — up to 10 pages per run, embedded
-          automatically.
+          Point it at a page or a sitemap — it reads and learns up to 10 pages.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">

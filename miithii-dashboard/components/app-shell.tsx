@@ -71,7 +71,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {/* miithii-corpo corporate mark (original work, this repo) */}
           <img src="/miithii-mark.svg" alt="" className="h-6 w-6 rounded-md" />
           <span className="font-semibold tracking-tight">MIITHII</span>
-          <span className="text-muted-foreground text-xs">copilot</span>
+          
         </div>
         <nav className="flex flex-col gap-1 p-3">{nav(true)}</nav>
         <div className="mt-auto p-3">

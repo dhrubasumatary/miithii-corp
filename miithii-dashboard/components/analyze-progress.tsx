@@ -5,10 +5,10 @@ import { BookOpen, Check, Loader2, PenLine, ScanSearch, ShieldCheck } from "luci
 import { cn } from "@/lib/utils";
 
 const STAGES: { key: string; label: string; icon: typeof ScanSearch }[] = [
-  { key: "classify", label: "Classifying ticket", icon: ScanSearch },
-  { key: "retrieve", label: "Retrieving knowledge", icon: BookOpen },
-  { key: "policy", label: "Applying support policy", icon: ShieldCheck },
-  { key: "draft", label: "Drafting response", icon: PenLine },
+  { key: "classify", label: "Reading the ticket", icon: ScanSearch },
+  { key: "retrieve", label: "Pulling from your docs", icon: BookOpen },
+  { key: "policy", label: "Checking policy", icon: ShieldCheck },
+  { key: "draft", label: "Writing the draft", icon: PenLine },
 ];
 
 /**

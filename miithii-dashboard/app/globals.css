@@ -86,19 +86,20 @@
 }
 
 .dark {
+  /* corporate floor -> rail -> well -> popover (whirl elevation doctrine) */
   --background: #0B1120;
   --foreground: #E6EDF7;
   --card: #101828;
   --card-foreground: #E6EDF7;
-  --popover: #101828;
+  --popover: #1B2A45;
   --popover-foreground: #E6EDF7;
   --primary: #3E63DD;
   --primary-foreground: #F8FAFC;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: #1B2436;
+  --muted: #16223A;
   --muted-foreground: #8CA0B8;
-  --accent: #1B2436;
+  --accent: #16223A;
   --accent-foreground: #E6EDF7;
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -109,7 +110,8 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: #0D1424;
+  /* chrome lands LIGHTER than the panel it frames (whirl doctrine) */
+  --sidebar: #15213A;
   --sidebar-foreground: #E6EDF7;
   --sidebar-primary: #3E63DD;
   --sidebar-primary-foreground: #F8FAFC;
@@ -129,4 +131,12 @@
   html {
     @apply font-sans;
   }
+}
+/* whirl doctrine: wells are recesses sunk into the surface — lighter than the
+   panel, an inset hairline outline, and a top-edge highlight that catches light. */
+@utility well {
+  background: #16223A;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.05),
+    inset 0 1px 0 rgb(255 255 255 / 0.12);
 }

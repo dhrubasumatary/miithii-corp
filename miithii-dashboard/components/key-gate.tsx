@@ -1,16 +1,9 @@
 "use client";
 
-import { KeyRound, ShieldCheck, Sparkles } from "lucide-react";
+import { KeyRound } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ENGINE_URL, KEY_STORAGE, engine } from "@/lib/engine";
@@ -37,13 +30,13 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
     setError("");
     try {
       const ok = await engine.verifyKey(input.trim());
-      if (!ok) throw new Error("Engine rejected this key");
+      if (!ok) throw new Error("That key didn't work");
       localStorage.setItem(KEY_STORAGE, input.trim());
       setKey(input.trim());
     } catch (err) {
       setError(
         err instanceof Error
-          ? `${err.message} — is the engine running at ${ENGINE_URL}?`
+          ? `${err.message} — engine at ${ENGINE_URL} reachable?`
           : "Verification failed",
       );
     } finally {
@@ -52,66 +45,63 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-svh items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <div className="mb-8 flex flex-col items-center gap-3 text-center">
-          {/* miithii-corpo corporate mark (original work, this repo) */}
+    <div className="relative flex min-h-svh items-center justify-center overflow-hidden p-6">
+      {/* the floor steps up around the panel — a quiet light behind it */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-1/3 left-1/2 h-[480px] w-[720px] -translate-x-1/2 rounded-full opacity-[0.07]"
+        style={{ background: "radial-gradient(closest-side, #3E63DD, transparent)" }}
+      />
+      <div className="relative w-full max-w-sm">
+        <div className="mb-7 flex flex-col items-center gap-3 text-center">
           <img
             src="/miithii-mark.svg"
             alt="MIITHII"
-            className="h-14 w-14 rounded-xl"
+            className="h-12 w-12 rounded-xl"
           />
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">MIITHII</h1>
-            <p className="text-muted-foreground text-sm">
-              Your support team's copilot — every answer policy-checked,
-              knowledge-backed, and fully audited.
+            <h1 className="text-lg font-semibold tracking-tight">MIITHII</h1>
+            <p className="text-muted-foreground mt-0.5 text-sm">
+              Draft support replies from your own docs.
             </p>
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Connect your workspace</CardTitle>
-            <CardDescription>
-              Paste a tenant API key — it stays in this browser and talks only
-              to your engine.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            void save();
+          }}
+          className="bg-card rounded-2xl border p-6"
+          style={{
+            boxShadow:
+              "inset 0 0 0 1px rgb(255 255 255 / 0.04), 0 8px 30px rgb(0 0 0 / 0.35)",
+          }}
+        >
+          <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="api-key" className="flex items-center gap-1.5">
                 <KeyRound className="h-3.5 w-3.5" />
-                API key
+                Workspace key
               </Label>
               <Input
                 id="api-key"
                 type="password"
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
-                onKeyDown={(event) => event.key === "Enter" && save()}
                 placeholder="mii_…"
                 autoFocus
               />
             </div>
             {error ? <p className="text-destructive text-sm">{error}</p> : null}
-            <Button onClick={save} disabled={busy || !input.trim()}>
-              {busy ? "Verifying…" : "Enter dashboard"}
+            <Button type="submit" disabled={busy || !input.trim()}>
+              {busy ? "Checking…" : "Open MIITHII"}
             </Button>
-            <div className="text-muted-foreground flex items-start gap-2 text-xs">
-              <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              Keys are hashed server-side; revoking one cuts access instantly.
-              No key? Run{" "}
-              <code className="bg-muted rounded px-1 font-mono">
-                uv run python scripts/seed_demo.py
-              </code>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </form>
 
-        <p className="text-muted-foreground mt-6 flex items-center justify-center gap-1.5 text-xs">
-          <Sparkles className="h-3.5 w-3.5" />
-          Drafts are suggestions — a human always sends the final word.
+        <p className="text-muted-foreground mt-5 text-center text-xs">
+          Every draft waits for a person. Nothing sends itself.
         </p>
       </div>
     </div>

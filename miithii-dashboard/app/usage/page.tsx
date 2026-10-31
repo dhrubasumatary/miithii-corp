@@ -50,7 +50,7 @@ export default function UsagePage() {
         <div>
           <h1 className="text-lg font-semibold">Usage & cost</h1>
           <p className="text-muted-foreground text-sm">
-            Last 14 days, from the same ledger that powers billing.
+            What the engine spent these two weeks.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={() => void refresh()}>
@@ -114,7 +114,7 @@ export default function UsagePage() {
             <TableSkeleton />
           ) : !usage?.days.length ? (
             <p className="text-muted-foreground py-8 text-center text-sm">
-              No usage in the last 14 days.
+              Nothing spent yet.
             </p>
           ) : (
             <Table>

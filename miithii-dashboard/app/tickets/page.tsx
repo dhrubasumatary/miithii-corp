@@ -107,8 +107,7 @@ export default function TicketsPage() {
         <div>
           <h1 className="text-lg font-semibold">Tickets</h1>
           <p className="text-muted-foreground text-sm">
-            Submit a customer ticket — MIITHII classifies it, applies policy,
-            retrieves your knowledge, and drafts the reply.
+            Paste what the customer sent. You get a draft grounded in your docs.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={() => void refresh()}>
@@ -120,9 +119,9 @@ export default function TicketsPage() {
       <FadeUp delay={0.04}>
       <Card>
         <CardHeader>
-          <CardTitle>New ticket</CardTitle>
+          <CardTitle>Draft a reply</CardTitle>
           <CardDescription>
-            The draft is a suggestion — review it, then send it yourself.
+            Ctrl+Enter to run.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -138,13 +137,13 @@ export default function TicketsPage() {
           />
           <div className="flex flex-col gap-1">
             <Textarea
-              placeholder="Paste the customer's message here…  (Ctrl+Enter to analyze)"
+              placeholder="What did the customer say? (Ctrl+Enter to run)"
               value={body}
               onChange={(event) => setBody(event.target.value)}
               rows={5}
               maxLength={10000}
               disabled={analyzing}
-              className="resize-none"
+              className="well resize-none"
             />
             <span className="text-muted-foreground self-end text-xs">
               {body.length}/10,000
@@ -157,7 +156,7 @@ export default function TicketsPage() {
             className="self-start transition-transform active:scale-[0.98]"
           >
             <Send className="h-4 w-4" />
-            {analyzing ? "Analyzing…" : "Analyze ticket"}
+            {analyzing ? "Drafting…" : "Draft reply"}
           </Button>
         </CardContent>
       </Card>
@@ -183,7 +182,7 @@ export default function TicketsPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Draft response</CardTitle>
+                <CardTitle>Draft</CardTitle>
                 <CardDescription>
                   {result.category.replaceAll("_", " ")} · {result.severity}
                   {result.confidence != null
@@ -233,8 +232,7 @@ export default function TicketsPage() {
             </div>
             {result.requires_human ? (
               <p className="text-sm text-red-400">
-                Human review required — do not send without an employee reading
-                this.
+                Needs a human read before this goes out.
               </p>
             ) : null}
           </CardContent>
@@ -247,7 +245,7 @@ export default function TicketsPage() {
         <CardHeader>
           <CardTitle>Queue</CardTitle>
           <CardDescription>
-            Most recent tickets — click a row for the full audit trail.
+            Everything you've run. Click a row for its trail.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -257,7 +255,7 @@ export default function TicketsPage() {
             <EmptyState
               icon="tickets"
               title="No tickets yet"
-              description="Analyze your first ticket above — every result lands in this queue with its full audit trail."
+              description="Your first draft will land in this queue."
             />
           ) : (
             <Table>
