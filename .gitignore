@@ -1,0 +1,29 @@
+# reference clone — stays local, never pushed (it has its own .git)
+supportpilot/
+
+# portable postgres scratch (binaries + data + logs)
+spike/pg-dist/
+spike/pg-data/
+spike/pg.log
+
+# python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# secrets — never in the repo
+.env
+.env.*
+!.env.example
+
+# node / next
+node_modules/
+.next/
+
+# OS
+Thumbs.db
+.DS_Store

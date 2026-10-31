@@ -1,0 +1,1058 @@
+{
+  "date": "2026-10-31",
+  "corpus": {
+    "python-versions": {
+      "url": "https://docs.astral.sh/uv/concepts/python-versions/",
+      "chars": 17249
+    },
+    "projects": {
+      "url": "https://docs.astral.sh/uv/concepts/projects/",
+      "chars": 628
+    },
+    "dependencies": {
+      "url": "https://docs.astral.sh/uv/concepts/dependencies/",
+      "chars": 46
+    },
+    "resolution": {
+      "url": "https://docs.astral.sh/uv/concepts/resolution/",
+      "chars": 38346
+    },
+    "cache": {
+      "url": "https://docs.astral.sh/uv/concepts/cache/",
+      "chars": 10760
+    },
+    "indexes": {
+      "url": "https://docs.astral.sh/uv/concepts/indexes/",
+      "chars": 13251
+    },
+    "tools": {
+      "url": "https://docs.astral.sh/uv/concepts/tools/",
+      "chars": 8860
+    },
+    "scripts": {
+      "url": "https://docs.astral.sh/uv/guides/scripts/",
+      "chars": 9180
+    },
+    "guide-projects": {
+      "url": "https://docs.astral.sh/uv/guides/projects/",
+      "chars": 6619
+    },
+    "guide-tools": {
+      "url": "https://docs.astral.sh/uv/guides/tools/",
+      "chars": 6627
+    },
+    "docker": {
+      "url": "https://docs.astral.sh/uv/guides/integration/docker/",
+      "chars": 17558
+    },
+    "pip-compat": {
+      "url": "https://docs.astral.sh/uv/pip/compatibility/",
+      "chars": 22777
+    },
+    "env-vars": {
+      "url": "https://docs.astral.sh/uv/reference/environment/",
+      "chars": 35193
+    },
+    "ruff-config": {
+      "url": "https://docs.astral.sh/ruff/configuration/",
+      "chars": 26761
+    },
+    "ruff-linter": {
+      "url": "https://docs.astral.sh/ruff/linter/",
+      "chars": 25354
+    },
+    "ruff-formatter": {
+      "url": "https://docs.astral.sh/ruff/formatter/",
+      "chars": 19089
+    },
+    "ruff-rules": {
+      "url": "https://docs.astral.sh/ruff/rules/",
+      "chars": 162973
+    },
+    "ruff-settings": {
+      "url": "https://docs.astral.sh/ruff/settings/",
+      "chars": 109758
+    },
+    "ruff-preview": {
+      "url": "https://docs.astral.sh/ruff/preview/",
+      "chars": 3134
+    },
+    "ruff-tutorial": {
+      "url": "https://docs.astral.sh/ruff/tutorial/",
+      "chars": 9495
+    }
+  },
+  "chunks": 141,
+  "embedding": "BAAI/bge-small-en-v1.5 via fastembed (local, 384d)",
+  "retrieval": {
+    "vec": {
+      "hit1": 18,
+      "hit3": 24,
+      "total": 30,
+      "hit1_pct": 0.6,
+      "hit3_pct": 0.8
+    },
+    "bm25": {
+      "hit1": 13,
+      "hit3": 23,
+      "total": 30,
+      "hit1_pct": 0.43333333333333335,
+      "hit3_pct": 0.7666666666666667
+    },
+    "hybrid": {
+      "hit1": 19,
+      "hit3": 24,
+      "total": 30,
+      "hit1_pct": 0.6333333333333333,
+      "hit3_pct": 0.8
+    }
+  },
+  "detail": [
+    {
+      "query": "how do I pin a specific python version for my project",
+      "expected": "python-versions",
+      "vec": {
+        "top3": [
+          "resolution",
+          "python-versions",
+          "scripts"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "python-versions",
+          "env-vars",
+          "env-vars"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "python-versions",
+          "resolution",
+          "env-vars"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "uv keeps downloading a python version I already have",
+      "expected": "python-versions",
+      "vec": {
+        "top3": [
+          "python-versions",
+          "scripts",
+          "python-versions"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "python-versions",
+          "python-versions",
+          "cache"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "python-versions",
+          "python-versions",
+          "python-versions"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "where does uv store my project's virtual environment",
+      "expected": "projects",
+      "vec": {
+        "top3": [
+          "docker",
+          "docker",
+          "guide-projects"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "bm25": {
+        "top3": [
+          "python-versions",
+          "env-vars",
+          "env-vars"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "hybrid": {
+        "top3": [
+          "docker",
+          "env-vars",
+          "python-versions"
+        ],
+        "hit1": false,
+        "hit3": false
+      }
+    },
+    {
+      "query": "how do I add a development dependency to my project",
+      "expected": "dependencies",
+      "vec": {
+        "top3": [
+          "scripts",
+          "resolution",
+          "guide-projects"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "bm25": {
+        "top3": [
+          "resolution",
+          "env-vars",
+          "docker"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "hybrid": {
+        "top3": [
+          "resolution",
+          "docker",
+          "env-vars"
+        ],
+        "hit1": false,
+        "hit3": false
+      }
+    },
+    {
+      "query": "lockfile keeps changing between machines",
+      "expected": "resolution",
+      "vec": {
+        "top3": [
+          "resolution",
+          "cache",
+          "guide-projects"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "pip-compat",
+          "guide-projects",
+          "resolution"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "guide-projects",
+          "resolution",
+          "docker"
+        ],
+        "hit1": false,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I resolve conflicts between package versions",
+      "expected": "resolution",
+      "vec": {
+        "top3": [
+          "resolution",
+          "resolution",
+          "resolution"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "resolution",
+          "resolution",
+          "guide-tools"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "resolution",
+          "resolution",
+          "resolution"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "uv install is slow, can I cache the wheels",
+      "expected": "cache",
+      "vec": {
+        "top3": [
+          "cache",
+          "docker",
+          "cache"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "cache",
+          "cache",
+          "indexes"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "cache",
+          "cache",
+          "docker"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I clear the uv cache",
+      "expected": "cache",
+      "vec": {
+        "top3": [
+          "cache",
+          "cache",
+          "docker"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "cache",
+          "cache",
+          "cache"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "cache",
+          "cache",
+          "docker"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "installing packages from a private package index",
+      "expected": "indexes",
+      "vec": {
+        "top3": [
+          "indexes",
+          "indexes",
+          "pip-compat"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "pip-compat",
+          "pip-compat",
+          "indexes"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "indexes",
+          "pip-compat",
+          "indexes"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I use a custom pypi mirror",
+      "expected": "indexes",
+      "vec": {
+        "top3": [
+          "env-vars",
+          "indexes",
+          "ruff-settings"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "env-vars",
+          "env-vars",
+          "indexes"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "env-vars",
+          "indexes",
+          "indexes"
+        ],
+        "hit1": false,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I run a one-off tool without installing it",
+      "expected": "tools",
+      "vec": {
+        "top3": [
+          "tools",
+          "guide-tools",
+          "guide-projects"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "ruff-formatter",
+          "tools",
+          "ruff-formatter"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "tools",
+          "guide-tools",
+          "tools"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "ruff and other tools via uvx",
+      "expected": "tools",
+      "vec": {
+        "top3": [
+          "guide-tools",
+          "tools",
+          "tools"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "tools",
+          "guide-tools",
+          "guide-tools"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "guide-tools",
+          "tools",
+          "tools"
+        ],
+        "hit1": false,
+        "hit3": true
+      }
+    },
+    {
+      "query": "can I put a script with inline dependencies in one file",
+      "expected": "scripts",
+      "vec": {
+        "top3": [
+          "scripts",
+          "scripts",
+          "resolution"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "scripts",
+          "scripts",
+          "scripts"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "scripts",
+          "scripts",
+          "scripts"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I run a python file with inline metadata",
+      "expected": "scripts",
+      "vec": {
+        "top3": [
+          "scripts",
+          "ruff-config",
+          "ruff-settings"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "scripts",
+          "scripts",
+          "scripts"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "scripts",
+          "scripts",
+          "scripts"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I create a new project with uv",
+      "expected": "guide-projects",
+      "vec": {
+        "top3": [
+          "guide-projects",
+          "projects",
+          "docker"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "guide-projects",
+          "scripts",
+          "python-versions"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "guide-projects",
+          "scripts",
+          "projects"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I build and publish my package",
+      "expected": "guide-projects",
+      "vec": {
+        "top3": [
+          "scripts",
+          "resolution",
+          "resolution"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "bm25": {
+        "top3": [
+          "env-vars",
+          "resolution",
+          "resolution"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "hybrid": {
+        "top3": [
+          "resolution",
+          "resolution",
+          "resolution"
+        ],
+        "hit1": false,
+        "hit3": false
+      }
+    },
+    {
+      "query": "how do I install tools globally with uv",
+      "expected": "guide-tools",
+      "vec": {
+        "top3": [
+          "tools",
+          "tools",
+          "guide-tools"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "guide-tools",
+          "tools",
+          "guide-tools"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "tools",
+          "guide-tools",
+          "guide-tools"
+        ],
+        "hit1": false,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I dockerize an app that uses uv",
+      "expected": "docker",
+      "vec": {
+        "top3": [
+          "docker",
+          "docker",
+          "docker"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "docker",
+          "docker",
+          "docker"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "docker",
+          "docker",
+          "docker"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "uv works locally but fails inside docker build",
+      "expected": "docker",
+      "vec": {
+        "top3": [
+          "docker",
+          "docker",
+          "docker"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "pip-compat",
+          "resolution",
+          "docker"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "docker",
+          "docker",
+          "resolution"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "uv pip commands behave differently than pip",
+      "expected": "pip-compat",
+      "vec": {
+        "top3": [
+          "pip-compat",
+          "resolution",
+          "docker"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "resolution",
+          "pip-compat",
+          "pip-compat"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "resolution",
+          "pip-compat",
+          "pip-compat"
+        ],
+        "hit1": false,
+        "hit3": true
+      }
+    },
+    {
+      "query": "what environment variables does uv respect",
+      "expected": "env-vars",
+      "vec": {
+        "top3": [
+          "env-vars",
+          "tools",
+          "env-vars"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "ruff-settings",
+          "pip-compat",
+          "env-vars"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "env-vars",
+          "pip-compat",
+          "env-vars"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I configure a proxy for uv",
+      "expected": "env-vars",
+      "vec": {
+        "top3": [
+          "scripts",
+          "env-vars",
+          "env-vars"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "env-vars",
+          "indexes",
+          "env-vars"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "env-vars",
+          "indexes",
+          "env-vars"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I select which lint rules are enabled",
+      "expected": "ruff-config",
+      "vec": {
+        "top3": [
+          "ruff-linter",
+          "ruff-linter",
+          "ruff-preview"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "bm25": {
+        "top3": [
+          "ruff-settings",
+          "ruff-preview",
+          "ruff-linter"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "hybrid": {
+        "top3": [
+          "ruff-linter",
+          "ruff-preview",
+          "ruff-linter"
+        ],
+        "hit1": false,
+        "hit3": false
+      }
+    },
+    {
+      "query": "where does ruff read its configuration from",
+      "expected": "ruff-config",
+      "vec": {
+        "top3": [
+          "ruff-config",
+          "ruff-config",
+          "ruff-linter"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "pip-compat",
+          "env-vars",
+          "guide-projects"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "hybrid": {
+        "top3": [
+          "ruff-config",
+          "ruff-formatter",
+          "ruff-config"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I ignore a rule for one line",
+      "expected": "ruff-rules",
+      "vec": {
+        "top3": [
+          "ruff-linter",
+          "ruff-linter",
+          "ruff-linter"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "bm25": {
+        "top3": [
+          "ruff-settings",
+          "ruff-linter",
+          "ruff-config"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "hybrid": {
+        "top3": [
+          "ruff-linter",
+          "ruff-linter",
+          "ruff-config"
+        ],
+        "hit1": false,
+        "hit3": false
+      }
+    },
+    {
+      "query": "ruff says F401 but the import is used",
+      "expected": "ruff-rules",
+      "vec": {
+        "top3": [
+          "ruff-settings",
+          "ruff-settings",
+          "ruff-config"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "bm25": {
+        "top3": [
+          "ruff-settings",
+          "ruff-linter",
+          "ruff-linter"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "hybrid": {
+        "top3": [
+          "ruff-linter",
+          "ruff-config",
+          "ruff-linter"
+        ],
+        "hit1": false,
+        "hit3": false
+      }
+    },
+    {
+      "query": "how do I format my code with ruff",
+      "expected": "ruff-formatter",
+      "vec": {
+        "top3": [
+          "ruff-formatter",
+          "ruff-formatter",
+          "ruff-config"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "ruff-settings",
+          "ruff-formatter",
+          "ruff-formatter"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "ruff-formatter",
+          "ruff-formatter",
+          "ruff-config"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I enable preview rules",
+      "expected": "ruff-preview",
+      "vec": {
+        "top3": [
+          "ruff-preview",
+          "ruff-linter",
+          "ruff-linter"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "ruff-preview",
+          "ruff-settings",
+          "ruff-linter"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "ruff-preview",
+          "ruff-linter",
+          "ruff-settings"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "getting started with ruff in a new project",
+      "expected": "ruff-tutorial",
+      "vec": {
+        "top3": [
+          "ruff-tutorial",
+          "ruff-config",
+          "ruff-linter"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "guide-projects",
+          "ruff-tutorial",
+          "docker"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "ruff-tutorial",
+          "ruff-rules",
+          "projects"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "query": "how do I change the line length for the formatter",
+      "expected": "ruff-settings",
+      "vec": {
+        "top3": [
+          "ruff-tutorial",
+          "ruff-settings",
+          "ruff-formatter"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "bm25": {
+        "top3": [
+          "ruff-tutorial",
+          "ruff-formatter",
+          "ruff-settings"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "hybrid": {
+        "top3": [
+          "ruff-settings",
+          "ruff-formatter",
+          "ruff-formatter"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    }
+  ],
+  "cost_model": {
+    "tokenizer": "cl100k_base (approximation of Gemini tokenizer)",
+    "fixed_prompt_tokens": 974,
+    "tokens_per_doc_4kb": 250,
+    "sample_tickets": {
+      "short": 22,
+      "medium": 45,
+      "long": 95
+    }
+  },
+  "caveats": [
+    "Corpus is a public docs site proxy, not a real tenant help center.",
+    "Embeddings are local bge-small, not the production embedding API (Gemini).",
+    "Vector store is numpy cosine, not pgvector; pgvector parity is a deferred live-DB test.",
+    "Hit-rate labeled against expected page, not against answer faithfulness."
+  ]
+}
