@@ -348,6 +348,47 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           </div>
         </FadeUp>
 
+        <FadeUp className="mt-32">
+          <h2 className="text-center text-3xl font-semibold tracking-tight">Pricing</h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-lg text-center">
+            Early access is free while we learn from the first teams. Billing
+            comes with the boring parts: invoices, SLAs, and a signed DPA.
+          </p>
+          <div className="mx-auto mt-10 grid max-w-2xl gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-[#3E63DD]/40 bg-[#3E63DD]/10 p-6 text-left">
+              <p className="text-sm font-medium text-[#9DB4FF]">Early access</p>
+              <p className="mt-2 text-3xl font-semibold">
+                $0<span className="text-muted-foreground text-base font-normal"> / month</span>
+              </p>
+              <ul className="text-muted-foreground mt-4 flex flex-col gap-2 text-sm">
+                <li>Your own workspace + named seats</li>
+                <li>Docs by upload or help-center crawl</li>
+                <li>Citations, policy checks, full audit trail</li>
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-left">
+              <p className="text-muted-foreground text-sm font-medium">With billing</p>
+              <p className="mt-2 text-3xl font-semibold">
+                Per seat<span className="text-muted-foreground text-base font-normal"> / month</span>
+              </p>
+              <ul className="text-muted-foreground mt-4 flex flex-col gap-2 text-sm">
+                <li>Everything in early access, unlimited</li>
+                <li>Priority region + custom domain</li>
+                <li>Invoices, SLA, signed DPA</li>
+              </ul>
+            </div>
+          </div>
+          <p className="text-muted-foreground mt-6 text-center text-sm">
+            Questions, or want in?{" "}
+            <a
+              href="https://github.com/dhrubasumatary/miithii-corp"
+              className="text-[#6B84FF] hover:underline"
+            >
+              github.com/dhrubasumatary/miithii-corp
+            </a>
+          </p>
+        </FadeUp>
+
         <FadeUp className="mt-32 mb-16 flex flex-col items-center gap-6 text-center">
           <h2 className="text-3xl font-semibold tracking-tight">
             Ready for drafts that wait for a person?

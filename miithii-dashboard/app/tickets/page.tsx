@@ -38,7 +38,7 @@ import { Input } from "@/components/ui/input";
 import { latency, relativeTime } from "@/lib/format";
 import { AppShell } from "@/components/app-shell";
 import { KeyGate } from "@/components/key-gate";
-import { engine } from "@/lib/engine";
+import { EngineError, engine } from "@/lib/engine";
 import type { AnalysisResult, TicketRow } from "@/lib/engine";
 
 export default function TicketsPage() {
@@ -77,9 +77,17 @@ export default function TicketsPage() {
     setCopied(false);
     setStage("classify");
     try {
-      const analysis = await engine.createTicketStream(subject.trim(), body.trim(), (s) =>
-        setStage(s),
-      );
+      let analysis: AnalysisResult;
+      try {
+        analysis = await engine.createTicketStream(subject.trim(), body.trim(), (s) =>
+          setStage(s),
+        );
+      } catch (streamErr) {
+        // stream path failed (proxy buffering, engine hiccup) — the plain
+        // endpoint does the same work without stage events
+        if (streamErr instanceof EngineError && streamErr.status === 401) throw streamErr;
+        analysis = await engine.createTicket(subject.trim(), body.trim());
+      }
       setResult(analysis);
       toast.success(`Analyzed — action: ${analysis.action.replaceAll("_", " ")}`);
       await refresh();
