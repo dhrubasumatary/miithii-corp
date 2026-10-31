@@ -8,10 +8,11 @@ everything below links to what's already live.
 
 Subject: Your support drafts, grounded in your own docs — free pilot
 
-Hi [name] — I built a support copilot that drafts replies to customer
-tickets using your own documentation, checks every draft against your
+Hi [name] — I built a support copilot that writes replies to customer
+tickets using your own documentation, checks every reply against your
 policies, and shows its sources line by line. A human always sends the
-final word.
+final word — the receipt on every reply proves what was checked and what
+it cost.
 
 You can see it working before committing to anything:
 https://miithii-dashboard.pages.dev — click "Create your workspace",
@@ -26,12 +27,15 @@ tell me what's broken, and your feedback shapes the roadmap. Interested?
 ## Why us, in numbers (all measured, in our repo + CI)
 
 - **95% retrieval hit@3** on our 50-ticket golden set — measured, not claimed
-- **~$0.002 per draft** — measured per request; pricing has margin at any tier
-- **<15s** typical draft end-to-end on the live deployment
+- **~$0.002 per reply** — measured per request, printed on every run's receipt; pricing has margin at any tier
+- **<15s** typical reply end-to-end on the live deployment
 - **Refusals verified on live traffic** — injection and key-extraction
   attempts are refused with policy flags, audited
-- **Nothing hides**: every draft carries citations, policy flags, confidence,
-  tokens, and measured cost; the audit trail is per-person and permanent
+- **Nothing hides, literally**: every reply ends with a receipt — action,
+  policy flags, confidence, latency, tokens, measured cost — plus citations,
+  and the audit trail is per-person and permanent
+- **Voice built in**: agents can dictate the customer's ticket instead of
+  pasting it (Sarvam speech-to-text, server-side key)
 
 ## What a design partner gets
 
@@ -50,7 +54,7 @@ tell me what's broken, and your feedback shapes the roadmap. Interested?
 
 ## What we explicitly DON'T do (say it up front — it closes deals)
 
-- Nothing sends automatically. A named human reviews and sends every draft.
+- Nothing sends automatically. A named human reviews and sends every reply.
 - We never train on your data. Your tickets never touch free-tier AI.
 - Your workspace is isolated at the database level (row-level security),
   verified by an automated test on every change.

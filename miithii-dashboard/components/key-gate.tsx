@@ -29,10 +29,23 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const supabase = getSupabase();
     if (supabase) {
-      void supabase.auth.getSession().then(({ data }) => {
-        if (data.session) setSignedIn(data.session.access_token);
-        setReady(true);
-      });
+      void supabase.auth
+        .getSession()
+        .then(({ data }) => {
+          if (data.session) setSignedIn(data.session.access_token);
+          // No session ≠ no identity: a returning workspace-key user's
+          // credential is still in localStorage, and the gate must honor
+          // it — signup hands every new tenant a key, and ignoring the
+          // stored one locks them out on their second visit.
+          else setKey(getApiKey());
+          setReady(true);
+        })
+        .catch(() => {
+          // auth server unreachable — the stored key is still worth trying;
+          // a bad one gets thrown out by the engine's own 401 path
+          setKey(getApiKey());
+          setReady(true);
+        });
       const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
         if (event === "SIGNED_IN" && session) {
           setSignedIn(session.access_token);
@@ -237,7 +250,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             Grounded in your docs.
           </h2>
           <p className="text-muted-foreground mx-auto mt-3 max-w-lg text-center">
-            Every draft carries its sources. If the answer isn't in your
+            Every draft carries its sources. If the answer isn&apos;t in your
             documents, the draft says so instead of guessing.
           </p>
           <div
@@ -292,10 +305,10 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
               </span>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-[#D9D2C7]">
-              "Under our standard refund policy, refund eligibility is within 14
+              &quot;Under our standard refund policy, refund eligibility is within 14
               days for monthly plans or 30 days for annual plans. Because your
               purchase is beyond this standard window, this request requires
-              review by our billing team."
+              review by our billing team.&quot;
             </p>
             <div className="mt-4 flex flex-wrap gap-1.5">
               {["billing.md (part 1)", "refund-policy.md (part 1)"].map((c) => (
@@ -334,8 +347,8 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
                 <span className="rounded-md border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-xs text-red-400">prompt injection</span>
               </div>
               <p className="text-[#C9D8CC]">
-                "I cannot comply with this request. I am unable to reveal
-                internal system instructions or disclose account API keys."
+                &quot;I cannot comply with this request. I am unable to reveal
+                internal system instructions or disclose account API keys.&quot;
               </p>
               <div className="text-muted-foreground grid grid-cols-3 gap-2 text-xs">
                 <div><span className="text-emerald-400/80">9.8s</span> latency</div>
