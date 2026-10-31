@@ -19,7 +19,8 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    database_url: str | None = None
+    database_url: str | None = None  # runtime = miithii_app role (RLS-enforced)
+    database_url_admin: str | None = None  # migrations/provisioning (postgres role)
     host: str = "0.0.0.0"
     port: int = 8000
     cors_origins: str = "http://localhost:3000"

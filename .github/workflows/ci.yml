@@ -24,3 +24,52 @@ jobs:
 
       - name: Unit tests (deterministic, no network)
         run: uv run pytest -q
+
+  db:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: miithii-engine
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: miithii
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL_ADMIN: postgresql://postgres:postgres@localhost:5432/miithii
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - run: uv sync --extra dev
+
+      - name: Enable pgvector
+        run: |
+          uv run python -c "
+          import psycopg
+          c = psycopg.connect('postgresql://postgres:postgres@localhost:5432/miithii', autocommit=True)
+          c.execute('CREATE SCHEMA IF NOT EXISTS extensions')
+          c.execute('CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA extensions')
+          print('pgvector ready')"
+
+      - name: Migrate (alembic upgrade head)
+        run: uv run alembic upgrade head
+
+      - name: Provision app role (RLS-enforced)
+        run: |
+          APP_URL=$(uv run python scripts/provision_app_role.py --no-env-write)
+          echo "APP_URL=$APP_URL" >> "$GITHUB_ENV"
+
+      - name: RLS probe (must fail-to-read cross-tenant)
+        run: uv run pytest tests/test_rls_probe.py -q
+        env:
+          DATABASE_URL: ${{ env.APP_URL }}

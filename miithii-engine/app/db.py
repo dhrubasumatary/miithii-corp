@@ -8,6 +8,7 @@ Do NOT swap to the transaction pooler (:6543) without revisiting RLS binding.
 from collections.abc import AsyncIterator
 
 from fastapi import Request
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -38,3 +39,16 @@ async def get_session(request: Request) -> AsyncIterator[AsyncSession]:
     factory: async_sessionmaker[AsyncSession] = request.app.state.session_factory
     async with factory() as session:
         yield session
+
+
+async def bind_tenant(session: AsyncSession, tenant_id) -> None:
+    """Bind the RLS tenant for this session's transactions (ADR-003).
+
+    Every request binds explicitly — we never rely on pooler state resets.
+    The session pooler (session mode) runs DISCARD ALL on release, but the
+    binding here is the contract, not the reset.
+    """
+    await session.execute(
+        text("SELECT set_config('app.current_tenant', :tid, false)"),
+        {"tid": str(tenant_id)},
+    )
