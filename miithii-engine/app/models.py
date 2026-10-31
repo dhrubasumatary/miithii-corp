@@ -35,7 +35,9 @@ class Base(DeclarativeBase):
 
 
 def _enum(enum_cls) -> Enum:
-    return Enum(enum_cls, native_enum=False, length=32, values_callable=lambda c: [m.value for m in c])
+    return Enum(
+        enum_cls, native_enum=False, length=32, values_callable=lambda c: [m.value for m in c]
+    )
 
 
 class TenantPlan(StrEnum):
@@ -91,7 +93,9 @@ class TimestampMixin:
 class Tenant(Base, TimestampMixin):
     __tablename__ = "tenants"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, server_default=text("gen_random_uuid()"))
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     plan: Mapped[TenantPlan] = mapped_column(
@@ -108,8 +112,12 @@ class Tenant(Base, TimestampMixin):
 class User(Base, TimestampMixin):
     __tablename__ = "users"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, server_default=text("gen_random_uuid()"))
-    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tenants.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
     email: Mapped[str] = mapped_column(String(320), nullable=False)
     name: Mapped[str | None] = mapped_column(String(200))
     role: Mapped[UserRole] = mapped_column(
@@ -122,11 +130,17 @@ class User(Base, TimestampMixin):
 class ApiKey(Base, TimestampMixin):
     __tablename__ = "api_keys"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, server_default=text("gen_random_uuid()"))
-    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tenants.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     key_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
-    rate_limit_tier: Mapped[str] = mapped_column(String(32), server_default="standard", nullable=False)
+    rate_limit_tier: Mapped[str] = mapped_column(
+        String(32), server_default="standard", nullable=False
+    )
     last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
@@ -134,8 +148,12 @@ class ApiKey(Base, TimestampMixin):
 class KnowledgeSource(Base, TimestampMixin):
     __tablename__ = "knowledge_sources"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, server_default=text("gen_random_uuid()"))
-    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tenants.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
     kind: Mapped[SourceKind] = mapped_column(_enum(SourceKind), nullable=False)
     origin_url: Mapped[str | None] = mapped_column(String(2048))
     title: Mapped[str | None] = mapped_column(String(500))
@@ -150,9 +168,15 @@ class KnowledgeSource(Base, TimestampMixin):
 class Chunk(Base, TimestampMixin):
     __tablename__ = "chunks"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, server_default=text("gen_random_uuid()"))
-    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tenants.id"), nullable=False, index=True)
-    source_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("knowledge_sources.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
+    source_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("knowledge_sources.id"), nullable=False, index=True
+    )
     ordinal: Mapped[int] = mapped_column(Integer, nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     content_tsv: Mapped[str | None] = mapped_column(
@@ -177,8 +201,12 @@ class Chunk(Base, TimestampMixin):
 class Ticket(Base, TimestampMixin):
     __tablename__ = "tickets"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, server_default=text("gen_random_uuid()"))
-    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tenants.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
     external_ref: Mapped[str | None] = mapped_column(String(200))
     subject: Mapped[str] = mapped_column(String(500), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
@@ -193,9 +221,15 @@ class Analysis(Base, TimestampMixin):
 
     __tablename__ = "analyses"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, server_default=text("gen_random_uuid()"))
-    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tenants.id"), nullable=False, index=True)
-    ticket_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tickets.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
+    ticket_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tickets.id"), nullable=False, index=True
+    )
     category: Mapped[str] = mapped_column(String(50), nullable=False)
     severity: Mapped[str] = mapped_column(String(8), nullable=False)
     difficulty: Mapped[str] = mapped_column(String(16), nullable=False)
@@ -220,8 +254,12 @@ class Analysis(Base, TimestampMixin):
 class Conversation(Base, TimestampMixin):
     __tablename__ = "conversations"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, server_default=text("gen_random_uuid()"))
-    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tenants.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
     ticket_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("tickets.id"), index=True)
     title: Mapped[str | None] = mapped_column(String(300))
 
@@ -229,9 +267,15 @@ class Conversation(Base, TimestampMixin):
 class Message(Base, TimestampMixin):
     __tablename__ = "messages"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, server_default=text("gen_random_uuid()"))
-    conversation_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("conversations.id"), nullable=False, index=True)
-    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tenants.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    conversation_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("conversations.id"), nullable=False, index=True
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
     role: Mapped[MessageRole] = mapped_column(_enum(MessageRole), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
 
@@ -239,8 +283,12 @@ class Message(Base, TimestampMixin):
 class UsageEvent(Base, TimestampMixin):
     __tablename__ = "usage_events"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, server_default=text("gen_random_uuid()"))
-    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tenants.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
     kind: Mapped[str] = mapped_column(String(40), nullable=False)  # classify | draft | embed | ...
     provider: Mapped[str | None] = mapped_column(String(50))
     model: Mapped[str | None] = mapped_column(String(80))

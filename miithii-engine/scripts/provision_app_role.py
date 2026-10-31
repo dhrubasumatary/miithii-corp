@@ -33,12 +33,11 @@ def load_env() -> dict[str, str]:
 
 def build_app_url(admin_url: str, password: str) -> str:
     parsed = urllib.parse.urlparse(admin_url)
-    netloc = f"{ROLE}.{parsed.username.split('.', 1)[1] if '.' in (parsed.username or '') else parsed.username}:{urllib.parse.quote(password, safe='')}"
+    quoted = urllib.parse.quote(password, safe="")
     # Supabase pooler usernames are "role.projectref"; direct hosts are plain "role".
-    if "." in (parsed.username or ""):
-        netloc = f"{ROLE}.{parsed.username.split('.', 1)[1]}:{urllib.parse.quote(password, safe='')}@{parsed.hostname}:{parsed.port}"
-    else:
-        netloc = f"{ROLE}:{urllib.parse.quote(password, safe='')}@{parsed.hostname}:{parsed.port}"
+    project = parsed.username.split(".", 1)[1] if "." in (parsed.username or "") else None
+    user = f"{ROLE}.{project}" if project else ROLE
+    netloc = f"{user}:{quoted}@{parsed.hostname}:{parsed.port}"
     return urllib.parse.urlunparse(parsed._replace(netloc=netloc))
 
 
@@ -48,7 +47,9 @@ def main() -> int:
     args = parser.parse_args()
 
     env = load_env()
-    admin_url = os.getenv("DATABASE_URL_ADMIN") or env.get("DATABASE_URL_ADMIN") or env.get("DATABASE_URL")
+    admin_url = (
+        os.getenv("DATABASE_URL_ADMIN") or env.get("DATABASE_URL_ADMIN") or env.get("DATABASE_URL")
+    )
     if not admin_url:
         print("ERROR: no admin URL (DATABASE_URL_ADMIN)", file=sys.stderr)
         return 1
@@ -57,13 +58,12 @@ def main() -> int:
     grants = [
         f"GRANT USAGE ON SCHEMA public, extensions TO {ROLE}",
         f"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO {ROLE}",
-        f"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {ROLE}",
+        "ALTER DEFAULT PRIVILEGES IN SCHEMA public "
+        f"GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {ROLE}",
     ]
 
     with psycopg.connect(admin_url, autocommit=True) as conn:
-        exists = conn.execute(
-            "SELECT 1 FROM pg_roles WHERE rolname = %s", (ROLE,)
-        ).fetchone()
+        exists = conn.execute("SELECT 1 FROM pg_roles WHERE rolname = %s", (ROLE,)).fetchone()
         if exists:
             conn.execute(f"ALTER ROLE {ROLE} LOGIN PASSWORD '{password}' NOBYPASSRLS")
             print(f"role {ROLE} already existed — password rotated")
