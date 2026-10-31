@@ -1,11 +1,9 @@
 "use client";
 
-import { KeyRound } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ENGINE_URL, KEY_STORAGE, engine } from "@/lib/engine";
 
 export function KeyGate({ children }: { children: React.ReactNode }) {
@@ -35,9 +33,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
       setKey(input.trim());
     } catch (err) {
       setError(
-        err instanceof Error
-          ? `${err.message} — engine at ${ENGINE_URL} reachable?`
-          : "Verification failed",
+        err instanceof Error ? `${err.message} — engine: ${ENGINE_URL}` : "Verification failed",
       );
     } finally {
       setBusy(false);
@@ -45,63 +41,46 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="relative flex min-h-svh items-center justify-center overflow-hidden p-6">
-      {/* the floor steps up around the panel — a quiet light behind it */}
+    <div className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden p-6">
       <div
         aria-hidden
-        className="pointer-events-none absolute top-1/3 left-1/2 h-[480px] w-[720px] -translate-x-1/2 rounded-full opacity-[0.07]"
+        className="pointer-events-none absolute top-1/4 left-1/2 h-[560px] w-[820px] -translate-x-1/2 rounded-full opacity-[0.10]"
         style={{ background: "radial-gradient(closest-side, #3E63DD, transparent)" }}
       />
-      <div className="relative w-full max-w-sm">
-        <div className="mb-7 flex flex-col items-center gap-3 text-center">
-          <img
-            src="/miithii-mark.svg"
-            alt="MIITHII"
-            className="h-12 w-12 rounded-xl"
-          />
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight">MIITHII</h1>
-            <p className="text-muted-foreground mt-0.5 text-sm">
-              Draft support replies from your own docs.
-            </p>
-          </div>
-        </div>
+      <div className="relative flex w-full max-w-2xl flex-col items-center gap-7 text-center">
+        <img src="/miithii-mark.svg" alt="MIITHII" className="h-11 w-11 rounded-xl" />
+
+        <h1 className="text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
+          Support drafts that{" "}
+          <span className="text-[#6B84FF]">actually know</span> your product
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          Grounded in your docs. Checked by your rules. Sent by you.
+        </p>
 
         <form
           onSubmit={(event) => {
             event.preventDefault();
             void save();
           }}
-          className="bg-card rounded-2xl border p-6"
-          style={{
-            boxShadow:
-              "inset 0 0 0 1px rgb(255 255 255 / 0.04), 0 8px 30px rgb(0 0 0 / 0.35)",
-          }}
+          className="flex w-full max-w-md items-center gap-2"
         >
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="api-key" className="flex items-center gap-1.5">
-                <KeyRound className="h-3.5 w-3.5" />
-                Workspace key
-              </Label>
-              <Input
-                id="api-key"
-                type="password"
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                placeholder="mii_…"
-                autoFocus
-              />
-            </div>
-            {error ? <p className="text-destructive text-sm">{error}</p> : null}
-            <Button type="submit" disabled={busy || !input.trim()}>
-              {busy ? "Checking…" : "Open MIITHII"}
-            </Button>
-          </div>
+          <Input
+            type="password"
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+            placeholder="Workspace key — mii_…"
+            autoFocus
+            className="well h-11 flex-1"
+          />
+          <Button type="submit" disabled={busy || !input.trim()} className="h-11">
+            {busy ? "Checking…" : "Open"}
+          </Button>
         </form>
+        {error ? <p className="text-destructive text-sm">{error}</p> : null}
 
-        <p className="text-muted-foreground mt-5 text-center text-xs">
-          Every draft waits for a person. Nothing sends itself.
+        <p className="text-muted-foreground text-xs">
+          মিথি — to understand. Every draft waits for a person.
         </p>
       </div>
     </div>
