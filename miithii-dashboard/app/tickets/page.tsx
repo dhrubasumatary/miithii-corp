@@ -11,6 +11,7 @@ import {
   Send,
   ShieldAlert,
 } from "lucide-react";
+import { Reply } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -134,7 +135,20 @@ export default function TicketsPage() {
 
   async function copyDraft() {
     if (!result?.answer) return;
-    await navigator.clipboard.writeText(result.answer);
+    try {
+      await navigator.clipboard.writeText(result.answer);
+    } catch {
+      /* Clipboard permission refused (or no gesture) — the old-fashioned
+         way still copies, and the button should never silently do nothing. */
+      const helper = document.createElement("textarea");
+      helper.value = result.answer;
+      helper.style.position = "fixed";
+      helper.style.opacity = "0";
+      document.body.appendChild(helper);
+      helper.select();
+      document.execCommand("copy");
+      helper.remove();
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   }
@@ -295,7 +309,7 @@ function ReplyResult({
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-2 text-sm font-medium">
-            <Send className="text-primary h-4 w-4" />
+            <Reply className="text-primary h-4 w-4" />
             The reply
           </span>
           <ActionBadge action={result.action} />
@@ -325,7 +339,9 @@ function ReplyResult({
         </div>
       ) : null}
 
-      <ReceiptRows result={result} />
+      <div className="max-w-md">
+        <ReceiptRows result={result} />
+      </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="text-muted-foreground text-xs">
