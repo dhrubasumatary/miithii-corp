@@ -68,6 +68,11 @@ async def test_create_and_read_ticket(monkeypatch):
                 assert len(analyses) == 1
                 assert analyses[0]["provider"] == "DeterministicProvider"
 
+                # regression: the 500 the live browser QA caught — these routes
+                # share require_tenant and must not fail on the key path
+                assert client.get("/v1/knowledge", headers=headers).status_code == 200
+                assert client.get("/v1/usage", headers=headers).status_code == 200
+
                 # cross-tenant invisibility: a bogus key sees nothing of this tenant
                 bogus = {"X-API-Key": "mii_" + secrets.token_urlsafe(18)}
                 assert client.get("/v1/tickets", headers=bogus).status_code == 401

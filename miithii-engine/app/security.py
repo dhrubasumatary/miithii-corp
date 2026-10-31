@@ -152,9 +152,9 @@ async def require_tenant(
     x_api_key: str | None = Header(default=None),
     authorization: str | None = Header(default=None),
 ) -> Tenant:
-    tenant, _ = await require_principal(
+    principal = await require_principal(
         session,
         x_api_key=x_api_key,
         authorization=authorization,
     )
-    return tenant
+    return principal.tenant
