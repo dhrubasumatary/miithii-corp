@@ -101,7 +101,14 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
       localStorage.setItem(KEY_STORAGE, keyInput.trim());
       setKey(keyInput.trim());
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Verification failed");
+      // "Failed to fetch" is ours to interpret, theirs to read — network
+      // trouble gets a sentence with a way forward, not a stack overflow
+      const raw = err instanceof Error ? err.message : "Verification failed";
+      setError(
+        /fetch|network|timed out/i.test(raw)
+          ? "Couldn't reach MIITHII — check your connection and try again."
+          : raw,
+      );
     } finally {
       setBusy(false);
     }
