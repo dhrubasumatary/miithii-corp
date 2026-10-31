@@ -17,7 +17,7 @@ import hashlib
 import time
 from datetime import UTC, datetime
 
-import jwt as pyjwt
+import httpx
 import structlog
 from fastapi import Depends, Header, HTTPException
 from sqlalchemy import select
@@ -29,46 +29,52 @@ from app.models import ApiKey, Tenant, User, UserRole
 
 logger = structlog.get_logger(__name__)
 
-_JWKS_CACHE: tuple[float, pyjwt.PyJWKClient] | None = None
-_JWKS_TTL = 3600.0
+_INTROSPECTION_CACHE: dict[str, tuple[float, dict]] = {}
+_INTROSPECTION_TTL = 300.0
 
 
-def _jwks_client() -> pyjwt.PyJWKClient | None:
-    global _JWKS_CACHE
+async def _verify_supabase_session(token: str) -> dict:
+    """Verify a Supabase session by introspecting it — the new sb_publishable_
+    key system has no JWKS; asking the auth server is the honest check.
+    Results cached briefly: the session token is the same object per login."""
     settings = get_settings()
-    if not settings.supabase_url:
-        return None
-    now = time.time()
-    if _JWKS_CACHE is None or now - _JWKS_CACHE[0] > _JWKS_TTL:
-        url = f"{settings.supabase_url.rstrip('/')}/auth/v1/jwks"
-        _JWKS_CACHE = (now, pyjwt.PyJWKClient(url))
-    return _JWKS_CACHE[1]
-
-
-def _verify_supabase_jwt(token: str) -> dict:
-    client = _jwks_client()
-    if client is None:
+    if not settings.supabase_url or not settings.supabase_publishable_key:
         raise HTTPException(status_code=503, detail="Human sign-in not configured")
+
+    cached = _INTROSPECTION_CACHE.get(token)
+    now = time.time()
+    if cached and now - cached[0] < _INTROSPECTION_TTL:
+        return cached[1]
+
     try:
-        signing_key = client.get_signing_key_from_jwt(token)
-        claims = pyjwt.decode(
-            token,
-            signing_key.key,
-            algorithms=["ES256", "RS256", "HS256"],
-            options={"verify_aud": False},
-        )
-    except pyjwt.PyJWTError as exc:
-        raise HTTPException(status_code=401, detail="Invalid session token") from exc
-    email = claims.get("email")
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.get(
+                f"{settings.supabase_url.rstrip('/')}/auth/v1/user",
+                headers={
+                    "apikey": settings.supabase_publishable_key,
+                    "Authorization": f"Bearer {token}",
+                },
+            )
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=503, detail="Auth server unreachable") from exc
+
+    if response.status_code == 401:
+        raise HTTPException(status_code=401, detail="Session expired or invalid")
+    if response.status_code != 200:
+        raise HTTPException(status_code=503, detail="Auth introspection failed")
+    user = response.json()
+    email = user.get("email")
     if not email:
         raise HTTPException(status_code=401, detail="Session has no email claim")
-    return {"email": str(email).lower(), "sub": str(claims.get("sub", ""))}
+    identity = {"email": str(email).lower(), "sub": str(user.get("id", ""))}
+    _INTROSPECTION_CACHE[token] = (now, identity)
+    return identity
 
 
 async def _human_principal(
     session: AsyncSession, token: str
 ) -> tuple[Tenant, User | None]:
-    identity = _verify_supabase_jwt(token)
+    identity = await _verify_supabase_session(token)
     email = identity["email"]
 
     user_row = (

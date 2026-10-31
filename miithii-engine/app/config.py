@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     embedding_model: str = "gemini-embedding-001"
     # text-embedding-004 was retired from the API (2026); gemini-embedding-001 is current
     supabase_url: str | None = None  # https://PROJECTREF.supabase.co
+    supabase_publishable_key: str | None = None  # for session introspection
     force_deterministic: bool = False  # tests/evals: no network, no cost
     host: str = "0.0.0.0"
     port: int = 8000
