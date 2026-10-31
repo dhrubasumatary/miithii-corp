@@ -8,7 +8,7 @@ const STAGES: { key: string; label: string; icon: typeof ScanSearch }[] = [
   { key: "classify", label: "Reading the ticket", icon: ScanSearch },
   { key: "retrieve", label: "Pulling from your docs", icon: BookOpen },
   { key: "policy", label: "Checking policy", icon: ShieldCheck },
-  { key: "draft", label: "Writing the draft", icon: PenLine },
+  { key: "draft", label: "Writing the reply", icon: PenLine },
 ];
 
 /**

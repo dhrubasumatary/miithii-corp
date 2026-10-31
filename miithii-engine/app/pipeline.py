@@ -177,4 +177,7 @@ class TicketAnalyzer:
             citations=sorted(documents or {}),
             confidence=draft.confidence,
             latency_ms=latency_ms,
+            prompt_tokens=draft.prompt_tokens,
+            completion_tokens=draft.completion_tokens,
+            cost_usd=estimate_cost(used_model, draft.prompt_tokens, draft.completion_tokens),
         )

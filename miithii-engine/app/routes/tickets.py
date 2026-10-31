@@ -167,6 +167,9 @@ async def ticket_analyses(
             "latency_ms": a.latency_ms,
             "provider": a.provider,
             "model": a.model,
+            "prompt_tokens": a.prompt_tokens,
+            "completion_tokens": a.completion_tokens,
+            "cost_usd": float(a.cost_usd) if a.cost_usd is not None else None,
             "created_at": a.created_at.isoformat(),
         }
         for a in rows

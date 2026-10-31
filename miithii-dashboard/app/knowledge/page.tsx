@@ -63,7 +63,7 @@ export default function KnowledgePage() {
         <div>
           <h1 className="text-lg font-semibold">Knowledge</h1>
           <p className="text-muted-foreground text-sm">
-            The docs your drafts come from.
+            The docs your replies come from.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={() => void refresh()}>

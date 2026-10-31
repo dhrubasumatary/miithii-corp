@@ -12,6 +12,9 @@ export type AnalysisResult = {
   citations: string[];
   confidence: number | null;
   latency_ms: number | null;
+  prompt_tokens: number | null;
+  completion_tokens: number | null;
+  cost_usd: number | null;
 };
 
 export type TicketRow = {
@@ -31,6 +34,9 @@ export type AnalysisRow = {
   latency_ms: number | null;
   provider: string | null;
   model: string | null;
+  prompt_tokens: number | null;
+  completion_tokens: number | null;
+  cost_usd: number | null;
   created_at: string;
 };
 

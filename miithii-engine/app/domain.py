@@ -93,3 +93,8 @@ class AnalysisResponse(BaseModel):
     citations: list[str] = Field(default_factory=list)
     confidence: float | None = None
     latency_ms: int | None = None
+    # the receipt: what the run actually spent. Measured, not estimated —
+    # the dashboard renders these as fine print on every reply.
+    prompt_tokens: int | None = None
+    completion_tokens: int | None = None
+    cost_usd: float | None = None

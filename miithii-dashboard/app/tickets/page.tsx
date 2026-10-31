@@ -1,20 +1,26 @@
 "use client";
 
-import { ArrowUpRight, Check, Copy, Mic, RefreshCw, Send } from "lucide-react";
+import {
+  ArrowUpRight,
+  Check,
+  Copy,
+  FileText,
+  Mic,
+  Receipt,
+  RefreshCw,
+  Send,
+  ShieldAlert,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { ActionBadge, FlagBadges } from "@/components/badges";
+import { ActionBadge, actionLabel, FlagBadges } from "@/components/badges";
 import { AnalyzeProgress } from "@/components/analyze-progress";
 import { FadeUp } from "@/components/motion";
 import { EmptyState, TableSkeleton } from "@/components/data-states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { VoiceFace } from "@/components/voice-face";
-import {
-  useVoiceInput,
-  useVoiceInputSupported,
-} from "@/lib/use-voice-input";
 import {
   Card,
   CardContent,
@@ -45,6 +51,10 @@ import { AppShell } from "@/components/app-shell";
 import { KeyGate } from "@/components/key-gate";
 import { EngineError, engine } from "@/lib/engine";
 import type { AnalysisResult, TicketRow } from "@/lib/engine";
+import {
+  useVoiceInput,
+  useVoiceInputSupported,
+} from "@/lib/use-voice-input";
 
 export default function TicketsPage() {
   const [tickets, setTickets] = useState<TicketRow[]>([]);
@@ -107,7 +117,7 @@ export default function TicketsPage() {
         analysis = await engine.createTicket(subject.trim(), body.trim());
       }
       setResult(analysis);
-      toast.success(`Analyzed — action: ${analysis.action.replaceAll("_", " ")}`);
+      toast.success(`Reply ready — ${actionLabel(analysis.action).toLowerCase()}`);
       await refresh();
       setSubject("");
       setBody("");
@@ -126,7 +136,7 @@ export default function TicketsPage() {
     if (!result?.answer) return;
     await navigator.clipboard.writeText(result.answer);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 2500);
   }
 
   return (
@@ -137,7 +147,8 @@ export default function TicketsPage() {
         <div>
           <h1 className="text-lg font-semibold">Tickets</h1>
           <p className="text-muted-foreground text-sm">
-            Paste what the customer sent. You get a draft grounded in your docs.
+            Paste what the customer sent. The reply comes from your docs —
+            you send it.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={() => void refresh()}>
@@ -149,9 +160,9 @@ export default function TicketsPage() {
       <FadeUp delay={0.04}>
       <Card>
         <CardHeader>
-          <CardTitle>Draft a reply</CardTitle>
+          <CardTitle>New reply</CardTitle>
           <CardDescription>
-            Ctrl+Enter to run.
+            Ctrl+Enter to run — takes about 15 seconds.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -208,96 +219,27 @@ export default function TicketsPage() {
             className="self-start transition-transform active:scale-[0.98]"
           >
             <Send className="h-4 w-4" />
-            {analyzing ? "Drafting…" : "Draft reply"}
+            {analyzing ? "Writing…" : "Write the reply"}
           </Button>
+
+          {/* The wait is part of the reply's arrival, not a separate
+              chapter — no card, no "provider load", just the engine's
+              real stages ticking past. */}
+          {analyzing ? <AnalyzeProgress active={analyzing} current={stage} /> : null}
+
+          {result && !analyzing ? (
+            <ReplyResult result={result} copied={copied} onCopy={() => void copyDraft()} />
+          ) : null}
         </CardContent>
       </Card>
       </FadeUp>
 
-      {analyzing ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Working on it</CardTitle>
-            <CardDescription>
-              Usually 10–45 seconds depending on provider load.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AnalyzeProgress active={analyzing} current={stage} />
-          </CardContent>
-        </Card>
-      ) : null}
-
-      {result && !analyzing ? (
-        <FadeUp>
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Draft</CardTitle>
-                <CardDescription>
-                  {result.category.replaceAll("_", " ")} · {result.severity}
-                  {result.confidence != null
-                    ? ` · ${Math.round(result.confidence * 100)}% confidence`
-                    : null}
-                  {latency(result.latency_ms)
-                    ? ` · ${latency(result.latency_ms)}`
-                    : null}
-                </CardDescription>
-              </div>
-              <ActionBadge action={result.action} />
-            </div>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <FlagBadges flags={result.policy_flags} />
-            <div className="rounded-md border bg-muted/40 p-4 text-sm whitespace-pre-wrap">
-              {result.answer ?? "No response generated."}
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              {result.citations.length ? (
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-muted-foreground text-xs">
-                    sources:
-                  </span>
-                  {result.citations.map((citation) => (
-                    <Badge key={citation} variant="outline">
-                      {citation}
-                    </Badge>
-                  ))}
-                </div>
-              ) : (
-                <span />
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void copyDraft()}
-                disabled={!result.answer}
-              >
-                {copied ? (
-                  <Check className="h-4 w-4 text-emerald-400" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-                {copied ? "Copied" : "Copy draft"}
-              </Button>
-            </div>
-            {result.requires_human ? (
-              <p className="text-sm text-red-400">
-                Needs a human read before this goes out.
-              </p>
-            ) : null}
-          </CardContent>
-        </Card>
-        </FadeUp>
-      ) : null}
-
       <FadeUp delay={0.08}>
       <Card>
         <CardHeader>
-          <CardTitle>Queue</CardTitle>
+          <CardTitle>History</CardTitle>
           <CardDescription>
-            Everything you&apos;ve run. Click a row for its trail.
+            Every ticket you&apos;ve run. Click a row for its full trail.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -306,8 +248,8 @@ export default function TicketsPage() {
           ) : tickets.length === 0 ? (
             <EmptyState
               icon="tickets"
-              title="No tickets yet"
-              description="Your first draft will land in this queue."
+              title="Nothing here yet"
+              description="The first reply you write will land in this queue."
             />
           ) : (
             <Table>
@@ -332,6 +274,121 @@ export default function TicketsPage() {
     </div>
     </AppShell>
     </KeyGate>
+  );
+}
+
+/* The reply, the receipt, and the handoff — one section, because this is
+   where the run ends. The receipt is the landing page's promise made real:
+   the same rows the hero shows (action, flags, measured spend), now with
+   the actual numbers this run produced. */
+function ReplyResult({
+  result,
+  copied,
+  onCopy,
+}: {
+  result: AnalysisResult;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  return (
+    <div className="border-border flex flex-col gap-5 border-t pt-5">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <span className="flex items-center gap-2 text-sm font-medium">
+            <Send className="text-primary h-4 w-4" />
+            The reply
+          </span>
+          <ActionBadge action={result.action} />
+        </div>
+        <div className="well rounded-lg p-4 text-[15px] leading-relaxed whitespace-pre-wrap">
+          {result.answer ?? "No response generated."}
+        </div>
+        {result.requires_human ? (
+          <p className="flex items-center gap-1.5 text-sm text-red-400">
+            <ShieldAlert className="h-4 w-4" />
+            Needs a human read before this goes out.
+          </p>
+        ) : null}
+      </div>
+
+      {result.citations.length ? (
+        <div className="flex flex-wrap items-center gap-1.5">
+          {result.citations.map((citation) => (
+            <span
+              key={citation}
+              className="border-border bg-muted/40 text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs"
+            >
+              <FileText className="h-3 w-3" />
+              {citation}
+            </span>
+          ))}
+        </div>
+      ) : null}
+
+      <ReceiptRows result={result} />
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <span className="text-muted-foreground text-xs">
+          Nothing sends itself — the reply is yours to send.
+        </span>
+        <Button
+          onClick={onCopy}
+          disabled={!result.answer}
+          className="transition-transform active:scale-[0.98]"
+        >
+          {copied ? (
+            <Check className="h-4 w-4" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
+          {copied ? "Copied — yours to send" : "Copy for sending"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/* Same row language as the hero demo's receipt panel: key muted on the
+   left, value on the right, hairline between. Numbers only when the run
+   actually produced them. */
+function ReceiptRows({ result }: { result: AnalysisResult }) {
+  const tokens =
+    result.prompt_tokens != null || result.completion_tokens != null
+      ? `${(result.prompt_tokens ?? 0).toLocaleString()} in · ${(result.completion_tokens ?? 0).toLocaleString()} out`
+      : null;
+  const latencyLabel = latency(result.latency_ms);
+  return (
+    <div className="flex flex-col gap-1.5 text-xs">
+      <div className="text-muted-foreground flex items-center gap-2 font-medium">
+        <Receipt className="h-3.5 w-3.5" />
+        Receipt
+      </div>
+      <Row k="category" v={result.category.replaceAll("_", " ")} />
+      <Row k="action" v={actionLabel(result.action)} />
+      <Row
+        k="flags"
+        v={
+          result.policy_flags.length
+            ? result.policy_flags.map((f) => f.replaceAll("_", " ")).join(", ")
+            : "none"
+        }
+      />
+      {result.confidence != null ? (
+        <Row k="confidence" v={`${Math.round(result.confidence * 100)}%`} />
+      ) : null}
+      {latencyLabel ? <Row k="latency" v={latencyLabel} /> : null}
+      {tokens ? <Row k="tokens" v={tokens} /> : null}
+      {result.cost_usd != null ? <Row k="cost" v={`$${result.cost_usd.toFixed(4)}`} /> : null}
+    </div>
+  );
+}
+
+function Row({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+      <span className="text-muted-foreground">{k}</span>
+      <span className="font-medium">{v}</span>
+    </div>
   );
 }
 
@@ -397,6 +454,9 @@ function TicketSheetRow({ ticket }: { ticket: TicketRow }) {
                     {analysis.provider}/{analysis.model}
                     {latency(analysis.latency_ms)
                       ? ` · ${latency(analysis.latency_ms)}`
+                      : null}
+                    {analysis.cost_usd != null
+                      ? ` · $${analysis.cost_usd.toFixed(4)}`
                       : null}
                   </CardDescription>
                 </CardHeader>
