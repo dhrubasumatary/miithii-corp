@@ -1,0 +1,8 @@
+supportpilot/
+spike/pg-dist/
+spike/pg-data/
+**/__pycache__/
+**/.venv/
+miithii-dashboard/
+docs/
+.git/

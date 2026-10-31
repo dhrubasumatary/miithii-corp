@@ -10,7 +10,9 @@ RUN uv sync --frozen --no-install-project --no-dev
 COPY app ./app
 COPY alembic ./alembic
 COPY alembic.ini ./
-RUN uv sync --frozen --no-dev
+# deps only — uvicorn imports the app package from WORKDIR, no install needed
+# (installing the project would require README.md for hatchling)
+RUN uv sync --frozen --no-dev --no-install-project
 
 FROM python:3.12-slim-bookworm
 WORKDIR /app
