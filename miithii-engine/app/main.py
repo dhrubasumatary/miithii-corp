@@ -1,8 +1,8 @@
 """MIITHII Engine — FastAPI application factory.
 
-Everything request-scoped is built inside lifespan (ADR/builder rule: no
-import-time singletons, no filesystem-path tricks). The app object at the
-bottom exists only as the uvicorn entrypoint (`app.main:app`).
+Everything request-scoped is built inside lifespan (no import-time
+singletons, no filesystem-path tricks). The module-level `app` exists only
+as the uvicorn entrypoint (`app.main:app`).
 """
 
 from contextlib import asynccontextmanager
@@ -15,9 +15,27 @@ from app.config import get_settings
 from app.db import create_db_engine, create_session_factory
 from app.logging_config import configure_logging
 from app.middleware import RequestContextMiddleware
+from app.pipeline import TicketAnalyzer
+from app.providers.base import Provider
+from app.providers.deterministic import DeterministicProvider
+from app.providers.gemini import GeminiProvider
 from app.routes.health import router as health_router
+from app.routes.tickets import router as tickets_router
 
 logger = structlog.get_logger(__name__)
+
+
+def _build_provider(settings) -> Provider:
+    if settings.force_deterministic:
+        return DeterministicProvider()
+    if settings.gemini_api_key:
+        return GeminiProvider(
+            api_key=settings.gemini_api_key,
+            model=settings.gemini_model,
+            timeout_s=settings.draft_timeout_s,
+        )
+    logger.warning("no_llm_provider_configured_deterministic_only")
+    return DeterministicProvider()
 
 
 def create_app() -> FastAPI:
@@ -26,6 +44,10 @@ def create_app() -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        app.state.analyzer = TicketAnalyzer(
+            provider=_build_provider(settings),
+            confidence_threshold=settings.classifier_confidence_threshold,
+        )
         if settings.database_url:
             engine = create_db_engine(settings.database_url)
             app.state.engine = engine
@@ -54,6 +76,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(health_router)
+    app.include_router(tickets_router)
     return app
 
 

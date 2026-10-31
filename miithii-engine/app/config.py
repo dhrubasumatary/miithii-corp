@@ -21,6 +21,13 @@ class Settings(BaseSettings):
 
     database_url: str | None = None  # runtime = miithii_app role (RLS-enforced)
     database_url_admin: str | None = None  # migrations/provisioning (postgres role)
+
+    gemini_api_key: str | None = None
+    gemini_model: str = "gemini-3.1-flash-lite"
+    openrouter_api_key: str | None = None  # adapter #2 (dev/failover), not prod PII
+    classifier_confidence_threshold: float = 0.6
+    draft_timeout_s: float = 45.0
+    force_deterministic: bool = False  # tests/evals: no network, no cost
     host: str = "0.0.0.0"
     port: int = 8000
     cors_origins: str = "http://localhost:3000"
