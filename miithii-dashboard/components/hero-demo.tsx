@@ -24,7 +24,7 @@ type Step = {
   secs: string;
 };
 
-const SCRIPT: Step[] = [
+export const DEMO_SCRIPT: Step[] = [
   {
     user: "Is Professional priced per user?",
     cited: "pricing.md",
@@ -60,7 +60,7 @@ const SCRIPT: Step[] = [
   },
 ];
 
-const DOCS = ["pricing.md", "refund-policy.md", "billing.md", "security.md"];
+export const DEMO_DOCS = ["pricing.md", "refund-policy.md", "billing.md", "security.md"];
 const USER_MS = 900;
 const THINK_MS = 1300;
 const CHAR_MS = 16;
@@ -70,7 +70,7 @@ export function HeroDemo() {
   const [stepIdx, setStepIdx] = useState(0);
   const [phase, setPhase] = useState<"user" | "think" | "draft" | "hold">("user");
   const [chars, setChars] = useState(0);
-  const step = SCRIPT[stepIdx];
+  const step = DEMO_SCRIPT[stepIdx];
 
   // phase machine
   useEffect(() => {
@@ -92,7 +92,7 @@ export function HeroDemo() {
     }
     if (phase === "hold") {
       const t = setTimeout(() => {
-        setStepIdx((i) => (i + 1) % SCRIPT.length);
+        setStepIdx((i) => (i + 1) % DEMO_SCRIPT.length);
         setChars(0);
         setPhase("user");
       }, HOLD_MS);
@@ -115,7 +115,7 @@ export function HeroDemo() {
             Knowledge
             <span className="text-muted-foreground ml-auto">48 articles</span>
           </div>
-          {DOCS.map((doc) => {
+          {DEMO_DOCS.map((doc) => {
             const active = phase !== "user" && step.cited === doc;
             return (
               <div
@@ -165,14 +165,14 @@ export function HeroDemo() {
                 <div className="mb-1.5 flex items-center gap-2">
                   <span className="font-medium">MIITHII</span>
                   {phase === "think" ? (
-                    <span className="text-muted-foreground flex items-center gap-1 text-[10px]">
+                    <span className="text-muted-foreground flex items-center gap-1 text-[11px]">
                       <Loader2 className="h-3 w-3 animate-spin" /> checking policy…
                     </span>
                   ) : null}
                   {activeAction ? (
                     <span
                       className={cn(
-                        "rounded-md border px-1.5 py-0.5 text-[10px]",
+                        "rounded-md border px-1.5 py-0.5 text-[11px]",
                         step.action === "answer"
                           ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
                           : step.action === "refuse"
@@ -197,14 +197,14 @@ export function HeroDemo() {
                 {phase === "hold" || (drafting && chars >= step.draft.length) ? (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {step.cited ? (
-                      <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] text-foreground">
+                      <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[11px] text-foreground">
                         {step.cited}
                       </span>
                     ) : null}
                     {step.flags.map((f) => (
                       <span
                         key={f}
-                        className="rounded border border-red-500/30 bg-red-500/10 px-1.5 py-0.5 text-[10px] text-red-400"
+                        className="rounded border border-red-500/30 bg-red-500/10 px-1.5 py-0.5 text-[11px] text-red-400"
                       >
                         {f}
                       </span>

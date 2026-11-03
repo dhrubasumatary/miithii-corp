@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { KEY_STORAGE, ENGINE_URL, engine } from "@/lib/engine";
+import { KEY_STORAGE, ENGINE_URL } from "@/lib/engine";
 
 export default function SignupPage() {
   const [company, setCompany] = useState("");
@@ -67,7 +67,7 @@ export default function SignupPage() {
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <p className="text-muted-foreground text-sm">
-              This key is shown once — it's the only credential for your
+              This key is shown once — it&apos;s the only credential for your
               workspace. Copy it somewhere safe.
             </p>
             <div className="rounded-lg border bg-muted/40 p-3 font-mono text-sm break-all">
@@ -139,7 +139,7 @@ export default function SignupPage() {
               {busy ? "Provisioning…" : "Create workspace"}
             </Button>
             <p className="text-muted-foreground text-center text-xs">
-              Engine: {ENGINE_URL} · every draft waits for a person.
+              Every draft waits for a person. Teammates sign in with their own email — no shared credentials.
             </p>
           </CardContent>
         </Card>
