@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 
-import { FadeUp } from "@/components/motion";
 import { DEMO_DOCS, DEMO_SCRIPT, HeroDemo } from "@/components/hero-demo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -330,7 +329,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           </div>
         </motion.div>
 
-        <FadeUp className="mt-28">
+        <div className="mt-28">
           <h2 id="how" className="text-center text-3xl font-semibold tracking-tight">
             Grounded in your docs.
           </h2>
@@ -358,9 +357,9 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
               Drafts cite the exact document and section they came from.
             </p>
           </div>
-        </FadeUp>
+        </div>
 
-        <FadeUp className="mt-28">
+        <div className="mt-28">
           <h2 className="text-center text-3xl font-semibold tracking-tight">
             Checked by your rules.
           </h2>
@@ -400,9 +399,9 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
               Needs a human read before this goes out.
             </p>
           </div>
-        </FadeUp>
+        </div>
 
-        <FadeUp className="mt-28">
+        <div className="mt-28">
           <h2 className="text-center text-3xl font-semibold tracking-tight">
             Nothing hides.
           </h2>
@@ -438,9 +437,9 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           </div>
-        </FadeUp>
+        </div>
 
-        <FadeUp className="mt-28">
+        <div className="mt-28">
           <div className="mx-auto grid max-w-2xl gap-8 text-center sm:grid-cols-3 sm:gap-4">
             {[
               ["95%", "of our test tickets get the right source cited"],
@@ -457,9 +456,9 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             Measured on our public test set — the receipt on every draft shows
             the same numbers for your own workspace.
           </p>
-        </FadeUp>
+        </div>
 
-        <FadeUp className="mt-28">
+        <div className="mt-28">
           <h2 id="pricing" className="text-center text-3xl font-semibold tracking-tight">Pricing</h2>
           <p className="text-muted-foreground mx-auto mt-3 max-w-lg text-center">
             Free while we&apos;re in early access. Billing comes with the boring
@@ -516,15 +515,15 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
               Write to us
             </a>
           </p>
-        </FadeUp>
+        </div>
 
-        <FadeUp className="mt-28 mb-16 flex flex-col items-center gap-6 text-center">
+        <div className="mt-28 mb-16 flex flex-col items-center gap-6 text-center">
           <h2 className="text-3xl font-semibold tracking-tight">
             Ready for replies that wait for a person?
           </h2>
           <div className="w-full">{heroAuth}</div>
           <p className="text-muted-foreground text-xs">
-            মিথি — to understand. Every draft waits for a person. Nothing sends itself.
+            Every draft waits for a person. Nothing sends itself.
           </p>
           <p className="text-muted-foreground/60 text-xs">
             <a
@@ -534,7 +533,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
               github.com/dhrubasumatary/miithii-corp
             </a>
           </p>
-        </FadeUp>
+        </div>
       </div>
     </div>
   );

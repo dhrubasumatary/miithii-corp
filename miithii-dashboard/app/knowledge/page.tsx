@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { EmptyState, TableSkeleton } from "@/components/data-states";
-import { FadeUp } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -85,14 +84,14 @@ export default function KnowledgePage() {
         </TabsList>
 
         <TabsContent value="upload">
-          <FadeUp>
+          <div>
             <UploadCard onDone={refresh} />
-          </FadeUp>
+          </div>
         </TabsContent>
         <TabsContent value="crawl">
-          <FadeUp>
+          <div>
             <CrawlCard onDone={refresh} />
-          </FadeUp>
+          </div>
         </TabsContent>
       </Tabs>
 
@@ -111,8 +110,8 @@ export default function KnowledgePage() {
           ) : sources.length === 0 ? (
             <EmptyState
               icon="knowledge"
-              title="Nothing learned yet"
-              description="Add a doc or crawl your help center — drafts cite whatever lands here."
+              title="Start with one document"
+              description="Add the policy your customers ask about most — your first draft will cite it. You can crawl your whole help center anytime."
             />
           ) : (
             <Table>

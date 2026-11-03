@@ -10,14 +10,15 @@ import {
   RefreshCw,
   Send,
   ShieldAlert,
+  ShieldCheck,
 } from "lucide-react";
 import { Reply } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { ActionBadge, actionLabel, FlagBadges } from "@/components/badges";
 import { AnalyzeProgress } from "@/components/analyze-progress";
-import { FadeUp } from "@/components/motion";
 import { EmptyState, TableSkeleton } from "@/components/data-states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,7 @@ import {
 
 export default function TicketsPage() {
   const [tickets, setTickets] = useState<TicketRow[]>([]);
+  const [docsCount, setDocsCount] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
@@ -86,6 +88,14 @@ export default function TicketsPage() {
       setTickets(await engine.listTickets());
     } catch {
       // 401 is handled globally (auto gate); anything else stays quiet
+    }
+    try {
+      // the get-started card needs to know whether the workspace has docs —
+      // a failure here only hides the checklist, never blocks the product
+      const docs = await engine.listKnowledge();
+      setDocsCount(docs.length);
+    } catch {
+      setDocsCount((current) => current ?? 0);
     } finally {
       setLoaded(true);
     }
@@ -171,7 +181,14 @@ export default function TicketsPage() {
         </Button>
       </div>
 
-      <FadeUp delay={0.04}>
+      {/* The new-workspace path: from empty to first sent reply. It leads
+          while the workspace is empty and dissolves once real work exists —
+          the product takes over. */}
+      {docsCount !== null && (docsCount === 0 || tickets.length === 0) ? (
+        <GetStarted docsCount={docsCount} ticketCount={tickets.length} />
+      ) : null}
+
+      <div>
       <Card>
         <CardHeader>
           <CardTitle>New reply</CardTitle>
@@ -246,9 +263,9 @@ export default function TicketsPage() {
           ) : null}
         </CardContent>
       </Card>
-      </FadeUp>
+      </div>
 
-      <FadeUp delay={0.08}>
+      <div>
       <Card>
         <CardHeader>
           <CardTitle>History</CardTitle>
@@ -284,7 +301,7 @@ export default function TicketsPage() {
           )}
         </CardContent>
       </Card>
-      </FadeUp>
+      </div>
     </div>
     </AppShell>
     </KeyGate>
@@ -404,6 +421,108 @@ function Row({ k, v }: { k: string; v: string }) {
     <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
       <span className="text-muted-foreground">{k}</span>
       <span className="font-medium">{v}</span>
+    </div>
+  );
+}
+
+/* The first-ten-minutes card: three steps from an empty workspace to a sent
+   reply. The numbering is honest — this really is a sequence. Each step's
+   check comes from live workspace state, not from click-tracking, and the
+   card dissolves the moment real work exists. */
+function GetStarted({
+  docsCount,
+  ticketCount,
+}: {
+  docsCount: number;
+  ticketCount: number;
+}) {
+  const steps = [
+    {
+      title: "Add your first document",
+      desc: "Start with the policy your customers ask about most — upload it, or point MIITHII at your help center.",
+      done: docsCount > 0,
+      to: docsCount === 0 ? "/knowledge" : null,
+      action: "Add a document",
+    },
+    {
+      title: "Draft your first reply",
+      desc: "Paste what the customer sent below. MIITHII drafts the reply from your docs and checks it against your rules.",
+      done: ticketCount > 0,
+      to: null,
+      action: null,
+    },
+  ];
+  const currentIdx = steps.findIndex((s) => !s.done);
+
+  return (
+    <div className="raised rounded-xl border border-border bg-card p-5">
+      <div className="flex flex-col gap-1">
+        <p className="text-sm font-medium">Set up your workspace</p>
+        <p className="text-muted-foreground text-xs">
+          Three steps from empty to your first sent reply.
+        </p>
+      </div>
+      <ol className="mt-4 flex flex-col gap-3">
+        {steps.map((step, i) => {
+          const isCurrent = i === currentIdx;
+          return (
+            <li
+              key={step.title}
+              className="flex items-start gap-3"
+            >
+              {step.done ? (
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+              ) : isCurrent ? (
+                <span className="bg-primary text-primary-foreground mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
+                  {i + 1}
+                </span>
+              ) : (
+                <span className="border-border text-muted-foreground mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-[10px]">
+                  {i + 1}
+                </span>
+              )}
+              <div className="min-w-0 flex-1">
+                <p
+                  className={
+                    step.done
+                      ? "text-muted-foreground text-sm"
+                      : "text-sm font-medium"
+                  }
+                >
+                  {step.title}
+                </p>
+                <p
+                  className={
+                    step.done
+                      ? "text-muted-foreground/60 text-xs"
+                      : "text-muted-foreground text-xs"
+                  }
+                >
+                  {step.desc}
+                </p>
+              </div>
+              {isCurrent && step.to ? (
+                <Link
+                  href={step.to}
+                  className="bg-primary text-primary-foreground hover:bg-primary-hover inline-flex h-7 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-transform active:scale-[0.98]"
+                >
+                  {step.action}
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </Link>
+              ) : null}
+            </li>
+          );
+        })}
+        <li className="flex items-start gap-3">
+          <ShieldCheck className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="text-muted-foreground text-sm">
+              Copy the finished draft into your helpdesk and send it —{" "}
+              <span className="text-foreground">that part is yours</span>.
+            </p>
+          </div>
+        </li>
+      </ol>
     </div>
   );
 }
