@@ -28,3 +28,14 @@ node_modules/
 Thumbs.db
 .DS_Store
 server.log
+
+# logs — never commit run output
+*.log
+
+# build artifacts
+miithii-dashboard/out/
+miithii-dashboard/.open-next/
+miithii-dashboard/.tmp-build/
+
+# local scratch
+*.tmp

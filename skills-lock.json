@@ -1,78 +1,6 @@
 {
   "version": 1,
   "skills": {
-    "docker-agent-config": {
-      "source": "docker/skills",
-      "sourceType": "github",
-      "skillPath": "skills/docker-agent-config/SKILL.md",
-      "computedHash": "274bf71d768f5309338417aaab88f11b03beb2074a4bab0d4c9c61887014d691"
-    },
-    "docker-agent-deploy": {
-      "source": "docker/skills",
-      "sourceType": "github",
-      "skillPath": "skills/docker-agent-deploy/SKILL.md",
-      "computedHash": "3639bd0227d149966153ad9c89040592883b094e0a046a3c4ed0911c2fcafef0"
-    },
-    "docker-agent-run": {
-      "source": "docker/skills",
-      "sourceType": "github",
-      "skillPath": "skills/docker-agent-run/SKILL.md",
-      "computedHash": "f7bdb1de88ee3c721d23cc0105190486463dd43a087d9885de98dc6788f737ae"
-    },
-    "docker-build-strategies": {
-      "source": "docker/skills",
-      "sourceType": "github",
-      "skillPath": "skills/docker-build-strategies/SKILL.md",
-      "computedHash": "7ea55a874f2cd5346f8eab7725b42b6dbdfc7aa50f97b094b7da97a31999e4a8"
-    },
-    "docker-compose-patterns": {
-      "source": "docker/skills",
-      "sourceType": "github",
-      "skillPath": "skills/docker-compose-patterns/SKILL.md",
-      "computedHash": "14140693bc1c11a7b59d2b5528c1cb9cd7501697ceb919bf5e820c33b4faff01"
-    },
-    "docker-destructive-guardrails": {
-      "source": "docker/skills",
-      "sourceType": "github",
-      "skillPath": "skills/docker-destructive-guardrails/SKILL.md",
-      "computedHash": "0a99d68e4fab5f6765aa9afca95a302ef83f102c11b1ad5d3211d350a2bdc5e5"
-    },
-    "docker-docs": {
-      "source": "docker/skills",
-      "sourceType": "github",
-      "skillPath": "skills/docker-docs/SKILL.md",
-      "computedHash": "be710a64a5f6940b3d118ded7b1bd391ab25fb85fd1524081a91d7f6cf18f995"
-    },
-    "docker-project-foundations": {
-      "source": "docker/skills",
-      "sourceType": "github",
-      "skillPath": "skills/docker-project-foundations/SKILL.md",
-      "computedHash": "7b7cc4fb8b60b65f60aefc203b5f21e55b85b0bc1d1db512b1dba36d3c278112"
-    },
-    "docker-sandboxes-env": {
-      "source": "docker/skills",
-      "sourceType": "github",
-      "skillPath": "skills/docker-sandboxes-env/SKILL.md",
-      "computedHash": "c0b78c12161d24456398afb31ad1e25b436266664acd284db95c552bd7a743db"
-    },
-    "docker-sandboxes-kits": {
-      "source": "docker/skills",
-      "sourceType": "github",
-      "skillPath": "skills/docker-sandboxes-kits/SKILL.md",
-      "computedHash": "b40e415f315eafbbd4937c3fd0d52e7189eb9861decec8399e7c27cdcb61d78c"
-    },
-    "docker-sandboxes-lifecycle": {
-      "source": "docker/skills",
-      "sourceType": "github",
-      "skillPath": "skills/docker-sandboxes-lifecycle/SKILL.md",
-      "computedHash": "775495b5d0e6b6006449b05eb57fac4e6b59604e056f1d95601fdd0cbff99928"
-    },
-    "docker-sandboxes-network-credentials": {
-      "source": "docker/skills",
-      "sourceType": "github",
-      "skillPath": "skills/docker-sandboxes-network-credentials/SKILL.md",
-      "computedHash": "63b2934c1e12cf30f6effa60d7382398d1f9990690632fe8f94a1e8c963143d4"
-    },
     "frontend-design": {
       "source": "anthropics/skills",
       "sourceType": "github",
@@ -84,18 +12,6 @@
       "sourceType": "github",
       "skillPath": ".claude/skills/interface-design/SKILL.md",
       "computedHash": "55a83a96d1e3d161b8c3630dab8ae2dd4547d92636d3d9b4b447d7d59163e084"
-    },
-    "supabase": {
-      "source": "supabase/agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/supabase/SKILL.md",
-      "computedHash": "af1844ade632808fc0c15cf2db87daf3b2431c5262dc8a0c3ea7d70880fadf91"
-    },
-    "supabase-postgres-best-practices": {
-      "source": "supabase/agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
-      "computedHash": "128fac78002d916c8ca908245d398e634f540d8bcf20915b2b2359aeb18eba59"
     }
   }
 }

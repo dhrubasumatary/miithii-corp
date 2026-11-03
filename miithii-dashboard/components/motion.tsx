@@ -3,8 +3,7 @@
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 
-/** whirl-grade entrance: short spring-less fade/scale (MIT, Desktop/miithii patterns). */
-export const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
 export function FadeUp({
   children,
