@@ -76,7 +76,7 @@ export default function UsagePage() {
               <CardDescription>Analyses</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-semibold">{totals?.events ?? 0}</p>
+              <p className="text-2xl font-semibold tabular-nums">{totals?.events ?? 0}</p>
             </CardContent>
           </Card>
           <Card>
@@ -84,7 +84,7 @@ export default function UsagePage() {
               <CardDescription>Tokens</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-semibold">
+              <p className="text-2xl font-semibold tabular-nums">
                 {((totals?.prompt_tokens ?? 0) + (totals?.completion_tokens ?? 0)).toLocaleString()}
               </p>
               <p className="text-muted-foreground text-xs">
@@ -94,10 +94,10 @@ export default function UsagePage() {
           </Card>
           <Card>
             <CardHeader className="pb-1">
-              <CardDescription>Estimated cost</CardDescription>
+              <CardDescription>Measured cost</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-semibold">
+              <p className="text-2xl font-semibold tabular-nums">
                 ${(totals?.cost_usd ?? 0).toFixed(4)}
               </p>
               <p className="text-muted-foreground text-xs">

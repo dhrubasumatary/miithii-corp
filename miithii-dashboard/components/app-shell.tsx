@@ -62,7 +62,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-svh">
       {/* mobile top bar */}
       <header className="fixed inset-x-0 top-0 z-20 flex h-14 items-center gap-3 border-b bg-sidebar px-4 md:hidden">
-        <img src="/miithii-mark.svg" alt="" className="h-6 w-6 rounded-md" />
+        <img src="/miithii-mark.svg" alt="" className="h-6 w-6 rounded-[6px]" />
         <span className="font-semibold tracking-tight">MIITHII</span>
         <nav className="ml-auto flex items-center gap-1">{nav(false)}</nav>
       </header>
@@ -70,7 +70,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-60 flex-col border-r bg-sidebar md:flex">
         <div className="flex h-14 items-center gap-2 border-b px-5">
           {/* miithii-corpo corporate mark (original work, this repo) */}
-          <img src="/miithii-mark.svg" alt="" className="h-6 w-6 rounded-md" />
+          <img src="/miithii-mark.svg" alt="" className="h-6 w-6 rounded-[6px]" />
           <span className="font-semibold tracking-tight">MIITHII</span>
           
         </div>

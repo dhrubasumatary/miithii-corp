@@ -119,7 +119,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
       return (
         <div className="bg-card mx-auto max-w-md rounded-2xl border p-6">
           <p className="flex items-center justify-center gap-2 font-medium">
-            <Mail className="text-[#6B84FF] h-4 w-4" />
+            <Mail className="text-primary h-4 w-4" />
             Check your inbox
           </p>
           <p className="text-muted-foreground mt-2 text-sm">
@@ -146,7 +146,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
         <Button
           type="submit"
           disabled={busy || !email.trim()}
-          className="h-10 rounded-full bg-white px-5 font-medium text-[#0B1120] hover:bg-white/90"
+          className="h-10 rounded-full bg-white px-5 font-medium text-[#181818] hover:bg-white/90"
         >
           {busy ? "Sending…" : "Sign in"}
         </Button>
@@ -169,7 +169,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
         <Button
           type="submit"
           disabled={busy || !keyInput.trim()}
-          className="h-10 rounded-full bg-white px-5 font-medium text-[#0B1120] hover:bg-white/90"
+          className="h-10 rounded-full bg-white px-5 font-medium text-[#181818] hover:bg-white/90"
         >
           {busy ? "Checking…" : "Open"}
         </Button>
@@ -206,7 +206,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 80% 50% at 50% -10%, rgb(62 99 221 / 0.22), transparent), radial-gradient(ellipse 60% 40% at 50% 110%, rgb(62 99 221 / 0.15), transparent), #0B1120",
+            "radial-gradient(ellipse 80% 50% at 50% -10%, rgb(99 91 255 / 0.16), transparent), radial-gradient(ellipse 60% 40% at 50% 110%, rgb(99 91 255 / 0.10), transparent), #141414",
         }}
       />
 
@@ -221,7 +221,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
         <div className="flex flex-col items-center pt-32 text-center">
           <h1 className="text-5xl font-semibold leading-[1.08] tracking-[-0.03em] md:text-6xl">
             Support drafts that{" "}
-            <span className="text-[#6B84FF]">actually know</span> your product
+            <span className="text-primary">actually know</span> your product
           </h1>
           <p className="text-muted-foreground mt-5 max-w-xl text-lg">
             Grounded in your docs. Checked by your rules. Sent by you.
@@ -230,7 +230,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           {error ? <p className="text-destructive mt-3 text-sm">{error}</p> : null}
           <div className="mt-4">{authToggle()}</div>
           <p className="mt-4 text-sm">
-            <Link href="/signup" className="text-[#6B84FF] hover:underline">
+            <Link href="/signup" className="text-primary hover:underline">
               No key? Create your workspace →
             </Link>
           </p>
@@ -245,7 +245,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           <div
             aria-hidden
             className="pointer-events-none absolute -inset-x-10 top-10 bottom-0 rounded-[40px] opacity-40"
-            style={{ background: "radial-gradient(ellipse at 50% 80%, #3E63DD 0%, transparent 65%)" }}
+            style={{ background: "radial-gradient(ellipse at 50% 80%, rgb(139 133 255) 0%, transparent 65%)" }}
           />
           <div className="relative overflow-hidden rounded-xl border border-white/10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)]">
             <HeroDemo />
@@ -261,11 +261,10 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             documents, the draft says so instead of guessing.
           </p>
           <div
-            className="mx-auto mt-10 max-w-xl overflow-hidden rounded-2xl border border-white/10 p-6"
-            style={{ background: "linear-gradient(135deg, #101B33, #0D1524)" }}
+            className="raised mx-auto mt-10 max-w-xl overflow-hidden rounded-2xl border border-border bg-card p-6"
           >
             <div className="flex items-center gap-2 text-sm font-medium">
-              <BookOpen className="h-4 w-4 text-[#6B84FF]" />
+              <BookOpen className="h-4 w-4 text-primary" />
               Knowledge
               <span className="text-muted-foreground ml-auto text-xs">48 articles</span>
             </div>
@@ -280,7 +279,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             </div>
             <div className="mt-5 flex flex-wrap gap-1.5">
               {["billing.md (part 1)", "pricing.md (part 2)", "refund-policy.md (part 1)"].map((c) => (
-                <span key={c} className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-xs text-[#9DB4FF]">
+                <span key={c} className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-xs text-foreground">
                   {c}
                 </span>
               ))}
@@ -297,8 +296,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             a human, and the draft says exactly that.
           </p>
           <div
-            className="mx-auto mt-10 max-w-xl rounded-2xl border border-white/10 p-6"
-            style={{ background: "linear-gradient(135deg, #241A12, #1A1410)" }}
+            className="raised mx-auto mt-10 max-w-xl rounded-2xl border border-border bg-card p-6"
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Refund outside the 30-day window</span>
@@ -311,7 +309,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
                 refund exception
               </span>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-[#D9D2C7]">
+            <p className="mt-4 text-sm leading-relaxed text-foreground-soft">
               &quot;Under our standard refund policy, refund eligibility is within 14
               days for monthly plans or 30 days for annual plans. Because your
               purchase is beyond this standard window, this request requires
@@ -319,7 +317,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             </p>
             <div className="mt-4 flex flex-wrap gap-1.5">
               {["billing.md (part 1)", "refund-policy.md (part 1)"].map((c) => (
-                <span key={c} className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-xs text-[#E8C49A]">
+                <span key={c} className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-xs text-muted-foreground">
                   {c}
                 </span>
               ))}
@@ -340,8 +338,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             tokens spent, the measured cost. Yours to inspect, forever.
           </p>
           <div
-            className="mx-auto mt-10 max-w-xl overflow-hidden rounded-2xl border border-white/10"
-            style={{ background: "linear-gradient(135deg, #0F2018, #0C1812)" }}
+            className="raised mx-auto mt-10 max-w-xl overflow-hidden rounded-2xl border border-border bg-card"
           >
             <div className="flex items-center gap-2 border-b border-white/5 px-6 py-4 text-sm font-medium">
               <Receipt className="h-4 w-4 text-emerald-400" />
@@ -353,7 +350,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
                 <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs text-amber-400">refuse</span>
                 <span className="rounded-md border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-xs text-red-400">prompt injection</span>
               </div>
-              <p className="text-[#C9D8CC]">
+              <p className="text-foreground">
                 &quot;I cannot comply with this request. I am unable to reveal
                 internal system instructions or disclose account API keys.&quot;
               </p>
@@ -374,7 +371,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
               ["<15s", "typical draft, end to end"],
             ].map(([big, small]) => (
               <div key={big} className="rounded-2xl border border-white/5 bg-white/[0.02] p-6">
-                <p className="text-2xl font-semibold text-[#6B84FF]">{big}</p>
+                <p className="text-2xl font-semibold text-primary">{big}</p>
                 <p className="text-muted-foreground mt-1 text-xs">{small}</p>
               </div>
             ))}
@@ -388,8 +385,8 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             comes with the boring parts: invoices, SLAs, and a signed DPA.
           </p>
           <div className="mx-auto mt-10 grid max-w-2xl gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-[#3E63DD]/40 bg-[#3E63DD]/10 p-6 text-left">
-              <p className="text-sm font-medium text-[#9DB4FF]">Early access</p>
+            <div className="rounded-2xl border border-primary/40 bg-primary/10 p-6 text-left">
+              <p className="text-sm font-medium text-foreground">Early access</p>
               <p className="mt-2 text-3xl font-semibold">
                 $0<span className="text-muted-foreground text-base font-normal"> / month</span>
               </p>
@@ -415,7 +412,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             Questions, or want in?{" "}
             <a
               href="https://github.com/dhrubasumatary/miithii-corp"
-              className="text-[#6B84FF] hover:underline"
+              className="text-primary hover:underline"
             >
               github.com/dhrubasumatary/miithii-corp
             </a>
@@ -429,7 +426,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           <div className="w-full">{authPanel()}</div>
           <div>{authToggle()}</div>
           <p className="mt-2 text-sm">
-            <Link href="/signup" className="text-[#6B84FF] hover:underline">
+            <Link href="/signup" className="text-primary hover:underline">
               No key? Create your workspace →
             </Link>
           </p>

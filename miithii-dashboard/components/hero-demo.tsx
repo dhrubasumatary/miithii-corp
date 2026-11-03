@@ -106,12 +106,12 @@ export function HeroDemo() {
     phase === "hold" || (drafting && chars > 4) ? step.action : null;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0D1524]/90 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)]">
+    <div className="overflow-hidden rounded-xl border border-white/10 bg-card/95 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)]">
       <div className="grid gap-px bg-white/5 sm:grid-cols-[1fr_1.5fr_1fr]">
         {/* knowledge panel */}
-        <div className="flex flex-col gap-2 bg-[#0B1120] p-4">
+        <div className="flex flex-col gap-2 bg-card p-4">
           <div className="flex items-center gap-2 text-xs font-medium">
-            <BookOpen className="h-3.5 w-3.5 text-[#6B84FF]" />
+            <BookOpen className="h-3.5 w-3.5 text-primary" />
             Knowledge
             <span className="text-muted-foreground ml-auto">48 articles</span>
           </div>
@@ -122,7 +122,7 @@ export function HeroDemo() {
                 key={doc}
                 className={cn(
                   "flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs transition-colors duration-300",
-                  active ? "bg-[#3E63DD]/25 text-[#9DB4FF]" : "text-muted-foreground",
+                  active ? "bg-primary/25 text-foreground" : "text-muted-foreground",
                 )}
               >
                 <FileTextMini />
@@ -134,12 +134,12 @@ export function HeroDemo() {
         </div>
 
         {/* conversation panel */}
-        <div className="flex min-h-[340px] flex-col gap-3 bg-[#0D1524] p-4">
+        <div className="flex min-h-[340px] flex-col gap-3 bg-card p-4">
           <div className="text-muted-foreground flex items-center gap-2 text-xs">
             <span
               className={cn(
                 "h-2 w-2 rounded-full",
-                phase === "draft" ? "bg-emerald-400" : "bg-[#6B84FF]",
+                phase === "draft" ? "bg-emerald-400" : "bg-primary",
               )}
             />
             miithii · live
@@ -160,7 +160,7 @@ export function HeroDemo() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                className="self-start rounded-xl rounded-bl-sm border border-white/10 bg-[#111B2E] px-3 py-2.5 text-xs"
+                className="self-start rounded-xl rounded-bl-sm border border-white/10 bg-well px-3 py-2.5 text-xs"
               >
                 <div className="mb-1.5 flex items-center gap-2">
                   <span className="font-medium">MIITHII</span>
@@ -197,7 +197,7 @@ export function HeroDemo() {
                 {phase === "hold" || (drafting && chars >= step.draft.length) ? (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {step.cited ? (
-                      <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] text-[#9DB4FF]">
+                      <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] text-foreground">
                         {step.cited}
                       </span>
                     ) : null}
@@ -217,9 +217,9 @@ export function HeroDemo() {
         </div>
 
         {/* receipt panel */}
-        <div className="flex flex-col gap-2 bg-[#0B1120] p-4">
+        <div className="flex flex-col gap-2 bg-card p-4">
           <div className="flex items-center gap-2 text-xs font-medium">
-            <Wrench className="h-3.5 w-3.5 text-[#6B84FF]" />
+            <Wrench className="h-3.5 w-3.5 text-primary" />
             Receipt
           </div>
           {phase === "think" ? (

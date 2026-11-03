@@ -433,7 +433,7 @@ function TicketSheetRow({ ticket }: { ticket: TicketRow }) {
           {ticket.subject}
         </TableCell>
         <TableCell>
-          <Badge variant="outline">{ticket.status}</Badge>
+          <Badge variant="outline" className="capitalize">{ticket.status}</Badge>
         </TableCell>
         <TableCell className="text-muted-foreground text-right text-xs">
           {relativeTime(ticket.created_at)}
