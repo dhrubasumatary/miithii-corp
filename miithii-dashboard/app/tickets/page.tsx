@@ -47,7 +47,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { latency, relativeTime } from "@/lib/format";
 import { AppShell } from "@/components/app-shell";
 import { KeyGate } from "@/components/key-gate";
@@ -62,7 +61,6 @@ export default function TicketsPage() {
   const [tickets, setTickets] = useState<TicketRow[]>([]);
   const [docsCount, setDocsCount] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [stage, setStage] = useState<string | null>(null);
@@ -106,8 +104,8 @@ export default function TicketsPage() {
   }, [refresh]);
 
   async function analyze() {
-    if (!subject.trim() || !body.trim()) {
-      setError("Both subject and message are required.");
+    if (!body.trim()) {
+      setError("Paste the customer's message first.");
       return;
     }
     setAnalyzing(true);
@@ -115,22 +113,36 @@ export default function TicketsPage() {
     setResult(null);
     setCopied(false);
     setStage("classify");
+    /* No subject field on purpose: the agent already HAS the customer's
+       ticket — inventing a headline for it is the engine's job, not theirs.
+       The queue label derives from the message itself: greetings and
+       sign-offs are short, the substance is long, so the longest of the
+       opening lines is the closest thing to a headline the writer already
+       produced. */
+    const derivedSubject =
+      body
+        .trim()
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .slice(0, 4)
+        .reduce((best, line) => (line.length > best.length ? line : best), "")
+        .slice(0, 80) || "Customer ticket";
     try {
       let analysis: AnalysisResult;
       try {
-        analysis = await engine.createTicketStream(subject.trim(), body.trim(), (s) =>
+        analysis = await engine.createTicketStream(derivedSubject, body.trim(), (s) =>
           setStage(s),
         );
       } catch (streamErr) {
         // stream path failed (proxy buffering, engine hiccup) — the plain
         // endpoint does the same work without stage events
         if (streamErr instanceof EngineError && streamErr.status === 401) throw streamErr;
-        analysis = await engine.createTicket(subject.trim(), body.trim());
+        analysis = await engine.createTicket(derivedSubject, body.trim());
       }
       setResult(analysis);
       toast.success(`Reply ready — ${actionLabel(analysis.action).toLowerCase()}`);
       await refresh();
-      setSubject("");
       setBody("");
     } catch (err) {
       const message =
@@ -193,35 +205,34 @@ export default function TicketsPage() {
         <CardHeader>
           <CardTitle>New reply</CardTitle>
           <CardDescription>
-            Ctrl+Enter to run — takes about 15 seconds.
+            Paste the customer&apos;s message. Ctrl+Enter runs it — about 15
+            seconds.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <Input
-            placeholder="Subject — e.g. Production API is down"
-            value={subject}
-            onChange={(event) => setSubject(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && event.ctrlKey) void analyze();
-            }}
-            maxLength={500}
-            disabled={analyzing}
-          />
           {voice.status !== "idle" ? (
             <VoiceFace voice={voice} />
           ) : (
-            <div className="flex flex-col gap-1">
+            <div className="well rounded-lg p-2">
               <Textarea
                 ref={bodyRef}
-                placeholder="What did the customer say? (Ctrl+Enter to run)"
+                placeholder="Paste the customer's message here…"
                 value={body}
                 onChange={(event) => setBody(event.target.value)}
-                rows={5}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && event.ctrlKey) {
+                    event.preventDefault();
+                    void analyze();
+                  }
+                }}
+                rows={7}
                 maxLength={10000}
                 disabled={analyzing}
-                className="well resize-none"
+                className="resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
               />
-              <div className="flex items-center justify-between">
+              {/* The action lives where the writing ends — chat-composer
+                  psychology, not a form's submit row. */}
+              <div className="flex items-center gap-2 px-1">
                 {voiceSupported ? (
                   <Button
                     variant="ghost"
@@ -237,21 +248,22 @@ export default function TicketsPage() {
                 ) : (
                   <span />
                 )}
-                <span className="text-muted-foreground text-xs">
+                <span className="text-muted-foreground text-xs tabular-nums">
                   {body.length}/10,000
                 </span>
+                <Button
+                  onClick={() => void analyze()}
+                  disabled={analyzing || !body.trim()}
+                  size="sm"
+                  className="ml-auto rounded-full transition-transform active:scale-[0.98]"
+                >
+                  <Send className="h-3.5 w-3.5" />
+                  {analyzing ? "Writing…" : "Write the reply"}
+                </Button>
               </div>
             </div>
           )}
           {error ? <p className="text-destructive text-sm">{error}</p> : null}
-          <Button
-            onClick={() => void analyze()}
-            disabled={analyzing || !subject.trim() || !body.trim()}
-            className="self-start transition-transform active:scale-[0.98]"
-          >
-            <Send className="h-4 w-4" />
-            {analyzing ? "Writing…" : "Write the reply"}
-          </Button>
 
           {/* The wait is part of the reply's arrival, not a separate
               chapter — no card, no "provider load", just the engine's
