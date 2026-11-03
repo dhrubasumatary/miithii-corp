@@ -111,7 +111,7 @@ export default function KnowledgePage() {
             <EmptyState
               icon="knowledge"
               title="Start with one document"
-              description="Add the policy your customers ask about most — your first draft will cite it. You can crawl your whole help center anytime."
+              description="Add the policy your customers ask about most; your first draft will cite it. You can crawl your whole help center anytime."
             />
           ) : (
             <Table>

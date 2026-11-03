@@ -439,7 +439,7 @@ function GetStarted({
   const steps = [
     {
       title: "Add your first document",
-      desc: "Start with the policy your customers ask about most — upload it, or point MIITHII at your help center.",
+      desc: "Start with the policy your customers ask about most. Upload it, or point MIITHII at your help center.",
       done: docsCount > 0,
       to: docsCount === 0 ? "/knowledge" : null,
       action: "Add a document",
@@ -517,8 +517,8 @@ function GetStarted({
           <ShieldCheck className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
           <div className="min-w-0 flex-1">
             <p className="text-muted-foreground text-sm">
-              Copy the finished draft into your helpdesk and send it —{" "}
-              <span className="text-foreground">that part is yours</span>.
+              Copy the finished draft into your helpdesk and send it.{" "}
+              <span className="text-foreground">That part is yours.</span>
             </p>
           </div>
         </li>

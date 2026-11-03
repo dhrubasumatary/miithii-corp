@@ -286,7 +286,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
 
       <div className="relative mx-auto max-w-4xl px-6">
         <div className="fixed inset-x-0 top-5 z-20 flex justify-center">
-          <div className="flex h-11 items-center gap-4 rounded-full border border-white/10 bg-black/50 px-5 backdrop-blur">
+          <div className="flex h-11 items-center gap-4 rounded-full border border-white/10 px-5 backdrop-blur-sm">
             <a href="#top" className="flex items-center gap-2.5">
               <img src="/miithii-mark.svg" alt="" className="h-5 w-5 rounded" />
               <span className="text-sm font-semibold tracking-tight">MIITHII</span>
@@ -335,10 +335,10 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           </h2>
           <p className="text-muted-foreground mx-auto mt-3 max-w-lg text-center">
             Upload a policy or point MIITHII at your help center. Every draft
-            carries its sources — and if the answer isn&apos;t in your
-            documents, the draft says so instead of guessing.
+            carries its sources. If the answer is not in your documents, the
+            draft says so instead of guessing.
           </p>
-          <div className="raised mx-auto mt-10 max-w-xl overflow-hidden rounded-2xl border border-border bg-card p-6">
+          <div className="glass raised mx-auto mt-10 max-w-xl overflow-hidden rounded-2xl border p-6">
             <div className="flex items-center gap-2 text-sm font-medium">
               <BookOpen className="h-4 w-4 text-primary" />
               Knowledge
@@ -367,7 +367,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             Policy is code, not a suggestion. Exceptions are refused, routed to
             a human, and the draft says exactly that.
           </p>
-          <div className="raised mx-auto mt-10 max-w-xl rounded-2xl border border-border bg-card p-6">
+          <div className="glass raised mx-auto mt-10 max-w-xl rounded-2xl border">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Refund outside the 30-day window</span>
               <span className="inline-flex items-center gap-1.5 text-xs font-medium text-red-400">
@@ -410,7 +410,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             flags, the tokens spent, the measured cost. Yours to inspect,
             forever.
           </p>
-          <div className="raised mx-auto mt-10 max-w-xl overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="glass raised mx-auto mt-10 max-w-xl overflow-hidden rounded-2xl border">
             <div className="flex items-center gap-2 border-b border-white/5 px-6 py-4 text-sm font-medium">
               <Receipt className="h-4 w-4 text-emerald-400" />
               Receipt — injection attempt
@@ -443,7 +443,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
           <div className="mx-auto grid max-w-2xl gap-8 text-center sm:grid-cols-3 sm:gap-4">
             {[
               ["95%", "of our test tickets get the right source cited"],
-              ["~$0.002", "measured cost per reply, printed on every receipt"],
+              ["~$0.002", "measured cost per reply, shown on every receipt"],
               ["<15s", "from pasted ticket to ready-to-send draft"],
             ].map(([big, small]) => (
               <div key={big} className="px-4">
@@ -465,7 +465,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
             parts: invoices, SLAs, and a signed DPA.
           </p>
           <div className="mx-auto mt-10 grid max-w-2xl gap-4 sm:grid-cols-2">
-            <div className="raised rounded-2xl border border-primary/40 bg-primary/10 p-6 text-left">
+            <div className="glass raised rounded-2xl border border-primary/40 p-6 text-left">
               <p className="text-sm font-medium text-foreground">Early access</p>
               <p className="mt-2 text-3xl font-semibold">
                 $0<span className="text-muted-foreground text-base font-normal"> / month</span>
@@ -476,7 +476,7 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
                 <li>Citations, policy checks, full audit trail</li>
               </ul>
             </div>
-            <div className="raised rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-left">
+            <div className="glass raised rounded-2xl border p-6 text-left">
               <p className="text-muted-foreground text-sm font-medium">With billing</p>
               <p className="mt-2 text-3xl font-semibold">
                 $29<span className="text-muted-foreground text-base font-normal"> / seat / month</span>
@@ -488,30 +488,30 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
               </ul>
             </div>
           </div>
-          <div className="raised mx-auto mt-10 max-w-2xl rounded-2xl border border-border bg-card p-6 text-left">
+          <div className="glass raised mx-auto mt-10 max-w-2xl rounded-2xl border p-6 text-left">
             <p className="text-sm font-medium">Your docs stay yours</p>
             <ul className="text-muted-foreground mt-3 grid gap-2 text-sm sm:grid-cols-2">
               <li className="flex items-start gap-2">
                 <ShieldCheck className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                Row-level database isolation — verified by a test on every change
+                Your data sits in its own database rows, walled off by a test we run on every change
               </li>
               <li className="flex items-start gap-2">
                 <ShieldCheck className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                Nothing sends automatically — a named person reviews and sends
+                A named person reviews and sends every draft. Nothing goes out on its own
               </li>
               <li className="flex items-start gap-2">
                 <ShieldCheck className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                Never trained on your tickets — paid, no-training AI tiers only
+                Your tickets never train an AI model. We pay for tiers that do not learn from you
               </li>
               <li className="flex items-start gap-2">
                 <ShieldCheck className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                Full audit trail per person, exportable, permanent
+                Every draft and every action is logged under the person who made it
               </li>
             </ul>
           </div>
           <p className="text-muted-foreground mt-6 text-center text-sm">
             Questions, or want in?{" "}
-            <a href="mailto:init.miithii@gmail.com" className="text-primary hover:underline">
+            <a href="mailto:hey@miithii.in" className="text-primary hover:underline">
               Write to us
             </a>
           </p>

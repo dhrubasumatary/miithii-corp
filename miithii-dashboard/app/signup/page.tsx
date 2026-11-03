@@ -67,8 +67,8 @@ export default function SignupPage() {
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <p className="text-muted-foreground text-sm">
-              This key is shown once — it&apos;s the only credential for your
-              workspace. Copy it somewhere safe.
+              This key is shown once. It is the only credential for your
+              workspace, so copy it somewhere safe.
             </p>
             <div className="rounded-lg border bg-muted/40 p-3 font-mono text-sm break-all">
               {mintedKey}
@@ -95,7 +95,7 @@ export default function SignupPage() {
           <div>
             <h1 className="text-lg font-semibold tracking-tight">Create your workspace</h1>
             <p className="text-muted-foreground text-sm">
-              One workspace per email. Your key is minted instantly.
+              One workspace per email. You get your key the moment it is created.
             </p>
           </div>
         </div>
@@ -139,7 +139,7 @@ export default function SignupPage() {
               {busy ? "Provisioning…" : "Create workspace"}
             </Button>
             <p className="text-muted-foreground text-center text-xs">
-              Every draft waits for a person. Teammates sign in with their own email — no shared credentials.
+              Every draft waits for a person. Teammates sign in with their own email, never a shared key.
             </p>
           </CardContent>
         </Card>
